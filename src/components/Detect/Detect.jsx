@@ -13,7 +13,7 @@ import Webcam from "react-webcam";
 import { SignImageData } from "../../data/SignImageData";
 import { useDispatch, useSelector } from "react-redux";
 import ProgressBar from "./ProgressBar/ProgressBar";
-import trainedModel from "../../assests/sign_language_recognizer_25-04-2023.task";
+// import trainedModel from "../../assests/sign_language_recognizer_25-04-2023.task";
 import DisplayImg from "../../assests/displayGif.gif";
 
 // const originalWarn = console.warn;
@@ -180,7 +180,8 @@ const Detect = () => {
       );
       const recognizer = await GestureRecognizer.createFromOptions(vision, {
         baseOptions: {
-          modelAssetPath: trainedModel,
+          modelAssetPath:
+            "https://cdn.jsdelivr.net/gh/agencyenterprise/hack-2024-sign-lang-learning@main/src/assests/sign_language_recognizer_25-04-2023.task",
         },
         numHands: 2,
         runningMode: runningMode,
