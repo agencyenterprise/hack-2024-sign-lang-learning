@@ -151,10 +151,10 @@ const Detect = () => {
   }, [predictWebcam]);
 
   const enableCam = useCallback(() => {
-    if (!gestureRecognizer) {
-      alert("Please wait for gestureRecognizer to load");
-      return;
-    }
+    // if (!gestureRecognizer) {
+    //   alert("Please wait for gestureRecognizer to load");
+    //   return;
+    // }
 
     if (webcamRunning === true) {
       setWebcamRunning(false);
@@ -219,39 +219,148 @@ const Detect = () => {
                   width: "100%",
                 }}
               >
-                <button
-                  style={{ marginBottom: "10px", width: "60px" }}
-                  onClick={enableCam}
-                >
-                  {webcamRunning ? "Stop" : "Start"}
-                </button>
-
-                <div
-                  style={{
-                    color: "white",
-                    fontSize: "20px",
-                  }}
-                >
-                  {gestureOutput ? (
-                    <p className="gesture_output">{gestureOutput}</p>
-                  ) : (
+                {gestureRecognizer ? (
+                  <>
+                    <button
+                      style={{
+                        padding: "10px 20px",
+                        backgroundColor: !webcamRunning ? "#3498db" : "#e74c3c",
+                        color: "white",
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                        fontFamily: "sans-serif",
+                        fontSize: "14px",
+                        fontWeight: "500",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                        transition: "all 0.2s ease",
+                        userSelect: "none",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        minWidth: "100px",
+                      }}
+                      onClick={enableCam}
+                    >
+                      {webcamRunning ? "Stop" : "Start"}
+                    </button>
                     <div
                       style={{
-                        height: "20px",
+                        color: "white",
+                        fontSize: "20px",
                       }}
-                    />
-                  )}
+                    >
+                      {gestureOutput && webcamRunning ? (
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            gap: "20px",
+                          }}
+                        >
+                          <div
+                            style={{
+                              height: "150px",
+                              backgroundColor: "#ffffff",
+                              border: "3px solid #3498db",
+                              borderRadius: "15px",
+                              display: "flex",
+                              flexDirection: "column",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+                              padding: "10px",
+                            }}
+                          >
+                            <span
+                              style={{
+                                fontSize: "80px",
+                                fontWeight: "bold",
+                                color: "#2c3e50",
+                                fontFamily: "Arial, sans-serif",
+                              }}
+                            >
+                              {gestureOutput}
+                            </span>
+                            <span
+                              style={{
+                                fontSize: "14px",
+                                color: "#7f8c8d",
+                                marginTop: "10px",
+                              }}
+                            >
+                              Detected Letter
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div
+                          style={{
+                            height: "20px",
+                          }}
+                        />
+                      )}
 
-                  {progress ? (
-                    <ProgressBar progress={progress} />
-                  ) : (
+                      {/* {progress ? (
+                        <ProgressBar progress={progress} />
+                      ) : (
+                        <div
+                          style={{
+                            height: "20px",
+                          }}
+                        />
+                      )} */}
+                    </div>
+                  </>
+                ) : (
+                  <div
+                    style={{
+                      color: "white",
+                      fontSize: "20px",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
                     <div
                       style={{
-                        height: "20px",
+                        marginBottom: "10px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "40px",
+                        fontWeight: "bold",
+                        flexDirection: "column",
                       }}
-                    />
-                  )}
-                </div>
+                    >
+                      Loading Model...
+                      <span style={{ fontSize: "24px", color: "#7f8c8d" }}>
+                        This may take a minute
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        border: "2px solid #f3f3f3",
+                        borderTop: "2px solid #3498db",
+                        borderRadius: "50%",
+                        width: "40px",
+                        height: "40px",
+                        animation: "spin 1s linear infinite",
+                        position: "relative",
+                      }}
+                    >
+                      <style>
+                        {`
+                      @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                      }
+                    `}
+                      </style>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
