@@ -19,7 +19,7 @@ import DisplayImg from "../../assests/displayGif.gif";
 import WordDisplay from "../WordDisplay";
 const easyWords = ["hi", "why", "love", ""];
 const mediumWords = ["hackathon", "hello", "world", "python", "javascript"];
-const hardWords = ["paodequeijo", "shenenigans"];
+const hardWords = ["caipirinha", "shenenigans"];
 const darkSouls = ["pneumonoultramicroscopicsilicovolcanoconiosis"];
 
 // const originalWarn = console.warn;
@@ -52,7 +52,7 @@ const LoadingModal = ({ isOpen }) => {
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: "#000",
+        backgroundColor: "rgba(0, 0, 0, 0.9)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -62,35 +62,51 @@ const LoadingModal = ({ isOpen }) => {
       <div
         style={{
           backgroundColor: "#1a1a1a",
-          padding: "2rem",
-          borderRadius: "10px",
+          padding: "3rem",
+          borderRadius: "15px",
           textAlign: "center",
+          border: "2px solid #333",
+          boxShadow: "0 20px 40px rgba(0,0,0,0.4)",
         }}
       >
         <div
           style={{
-            marginBottom: "10px",
+            marginBottom: "20px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: "40px",
-            fontWeight: "bold",
             flexDirection: "column",
             color: "white",
           }}
         >
-          Loading Model...
-          <span style={{ fontSize: "24px", color: "#7f8c8d" }}>
+          <span
+            style={{
+              fontSize: "40px",
+              fontWeight: "bold",
+              background: "linear-gradient(45deg, #4CAF50, #2196F3)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            Loading Model
+          </span>
+          <span
+            style={{
+              fontSize: "24px",
+              color: "#7f8c8d",
+              marginTop: "10px",
+            }}
+          >
             This may take a minute
           </span>
         </div>
         <div
           style={{
-            border: "2px solid #f3f3f3",
-            borderTop: "2px solid #3498db",
+            border: "3px solid #333",
+            borderTop: "3px solid #4CAF50",
             borderRadius: "50%",
-            width: "40px",
-            height: "40px",
+            width: "50px",
+            height: "50px",
             animation: "spin 1s linear infinite",
             margin: "0 auto",
           }}
@@ -394,7 +410,7 @@ const Detect = ({ customWord }) => {
   }, [alwaysShowSigns]);
 
   return (
-    <>
+    <div style={{ backgroundColor: "#1a1a1a", minHeight: "100vh" }}>
       <div
         style={{
           position: "absolute",
@@ -417,205 +433,165 @@ const Detect = ({ customWord }) => {
         webcamRunning={webcamRunning}
         isCustomWord={!!customWord}
       />
-      <div style={{ height: "20px" }} />
-      <div
-        style={{
-          color: "white",
-          display: "grid",
-          gridTemplateColumns: "2fr 1fr", // Changed from 1fr 1fr to 2fr 1fr
-          justifyContent: "center",
-          alignItems: "center",
-          gap: "20px",
-        }}
-      >
-        {webcamRunning ? (
-          <>
-            <WordDisplay
-              targetWord={targetWord}
-              currentLetterIndex={currentLetterIndex}
-              congratulations={congratulations}
-              alwaysShowSigns={alwaysShowSigns}
-              renderBasedOnDifficulty={renderBasedOnDifficulty}
-              difficulty={difficulty}
-              time={Math.floor(((endTime || Date.now()) - startTime) / 1000)}
-            />
-          </>
-        ) : (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              fontSize: "20px",
-              fontWeight: "bold",
-            }}
-          >
+
+      <div style={{ padding: "20px 40px" }}>
+        <div
+          style={{
+            color: "white",
+            display: "grid",
+            gridTemplateColumns: "2fr 1fr",
+            gap: "40px",
+            maxWidth: "1600px",
+            margin: "0 auto",
+          }}
+        >
+          {webcamRunning ? (
             <div
               style={{
-                fontSize: "48px",
-                fontWeight: "800",
-                color: "#fff",
-                textShadow: "3px 3px 0 rgba(0,0,0,0.2)",
-                marginBottom: "30px",
-                letterSpacing: "2px",
-                textAlign: "center",
-              }}
-            >
-              Let's Learn <br /> Sign Language!
-            </div>
-            <button
-              style={{
-                padding: "20px 40px",
-                width: "300px",
-                backgroundColor: !webcamRunning ? "#4CAF50" : "#f44336",
-                color: "white",
-                border: "none",
-                borderRadius: "50px",
-                cursor: "pointer",
-                fontSize: "44px",
-                fontWeight: "800",
-                textTransform: "uppercase",
+                background: "#2a2a2a",
+                padding: "30px",
+                borderRadius: "15px",
                 boxShadow: "0 10px 20px rgba(0,0,0,0.2)",
-                transition: "all 0.3s ease",
-                transform: "scale(1)",
-                ":hover": {
-                  transform: "scale(1.05)",
-                  boxShadow: "0 15px 25px rgba(0,0,0,0.3)",
-                },
               }}
-              onClick={toggleDetection}
             >
-              {webcamRunning ? "Stop" : "Start"}
-            </button>
-          </div>
-        )}
-        {!accessToken ? (
-          <div style={{ width: "600px", position: "relative" }}>
+              <WordDisplay
+                targetWord={targetWord}
+                currentLetterIndex={currentLetterIndex}
+                congratulations={congratulations}
+                alwaysShowSigns={alwaysShowSigns}
+                renderBasedOnDifficulty={renderBasedOnDifficulty}
+                difficulty={difficulty}
+                time={Math.floor(((endTime || Date.now()) - startTime) / 1000)}
+              />
+            </div>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: "40px",
+                background: "#2a2a2a",
+                borderRadius: "15px",
+                boxShadow: "0 10px 20px rgba(0,0,0,0.2)",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "48px",
+                  fontWeight: "800",
+                  background: "linear-gradient(45deg, #4CAF50, #2196F3)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  marginBottom: "30px",
+                  letterSpacing: "2px",
+                  textAlign: "center",
+                }}
+              >
+                Let's Learn <br /> Sign Language!
+              </div>
+              <button
+                style={{
+                  padding: "20px 40px",
+                  width: "300px",
+                  backgroundColor: !webcamRunning ? "#4CAF50" : "#f44336",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "50px",
+                  cursor: "pointer",
+                  fontSize: "44px",
+                  fontWeight: "800",
+                  textTransform: "uppercase",
+                  boxShadow: "0 10px 20px rgba(0,0,0,0.2)",
+                  transition: "all 0.3s ease",
+                  transform: "scale(1)",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = "scale(1.05)";
+                  e.target.style.boxShadow = "0 15px 25px rgba(0,0,0,0.3)";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = "scale(1)";
+                  e.target.style.boxShadow = "0 10px 20px rgba(0,0,0,0.2)";
+                }}
+                onClick={toggleDetection}
+              >
+                {webcamRunning ? "Stop" : "Start"}
+              </button>
+            </div>
+          )}
+
+          <div
+            style={{
+              background: "#2a2a2a",
+              padding: "30px",
+              borderRadius: "15px",
+              boxShadow: "0 10px 20px rgba(0,0,0,0.2)",
+            }}
+          >
             {gestureRecognizer ? (
               <div
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  alignItems: "flex-start",
-                  justifyContent: "flex-end",
+                  gap: "20px",
                 }}
               >
-                <div
-                  style={{
-                    color: "white",
-                    fontSize: "20px",
-                  }}
-                >
-                  {showDynamicOutput ? (
-                    <div
+                {showDynamicOutput && (
+                  <div
+                    style={{
+                      minHeight: "140px",
+                      padding: "20px",
+                      background: "#1a1a1a",
+                      borderRadius: "15px",
+                      textAlign: "center",
+                    }}
+                  >
+                    <span
                       style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        gap: "20px",
-                        position: "relative",
+                        fontSize: "80px",
+                        fontWeight: "800",
+                        background: "linear-gradient(45deg, #4CAF50, #2196F3)",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
                       }}
                     >
-                      <div
-                        style={{
-                          width: "600px",
-                          height: "100px",
-                          border: "2px solid #fff",
-                          background: "#000",
-                          borderRadius: "30px",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
-                          position: "relative",
-                          overflow: "hidden",
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontSize: "80px",
-                            fontWeight: "800",
-                            color: "#fff",
-                            textShadow: "3px 3px 0 rgba(0,0,0,0.2)",
-                            letterSpacing: "4px",
-                            animation: "float 3s ease-in-out infinite",
-                          }}
-                        >
-                          {gestureOutput}
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div
-                      style={{
-                        height: "20px",
-                      }}
-                    />
-                  )}
+                      {gestureOutput}
+                    </span>
+                  </div>
+                )}
 
-                  {/* {progress ? (
-                        <ProgressBar progress={progress} />
-                      ) : (
-                        <div
-                          style={{
-                            height: "20px",
-                          }}
-                        />
-                      )} */}
+                <div style={{ position: "relative" }}>
+                  <Webcam
+                    audio={false}
+                    ref={webcamRef}
+                    style={{
+                      width: "100%",
+
+                      borderRadius: "15px",
+                      boxShadow: "0 10px 20px rgba(0,0,0,0.2)",
+                    }}
+                  />
+                  <canvas
+                    style={{
+                      display: showHandTracking ? "block" : "none",
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      borderRadius: "15px",
+                    }}
+                    ref={canvasRef}
+                  />
                 </div>
               </div>
             ) : null}
-            <div style={{ position: "relative" }}>
-              <Webcam
-                audio={false}
-                ref={webcamRef}
-                // screenshotFormat="image/jpeg"
-                className="signlang_webcam"
-              />
-              <canvas
-                style={{
-                  display: showHandTracking ? "block" : "none",
-                }}
-                ref={canvasRef}
-                className="signlang_canvas"
-              />
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "100%",
-                }}
-              ></div>
-            </div>
-            {/* <div className="signlang_imagelist-container">
-              <h2 className="gradient__text">Image</h2>
-
-              <div className="signlang_image-div">
-                {currentImage ? (
-                  <img src={currentImage.url} alt={`img ${currentImage.id}`} />
-                ) : (
-                  <h3 className="gradient__text">
-                    Click on the Start Button <br /> to practice with Images
-                  </h3>
-                )}
-              </div>
-            </div> */}
           </div>
-        ) : (
-          <div className="signlang_detection_notLoggedIn">
-            <h1 className="gradient__text">Please Login !</h1>
-            <img src={DisplayImg} alt="diplay-img" />
-            <p>
-              We Save Your Detection Data to show your progress and learning in
-              dashboard, So please Login to Test this Detection Feature.
-            </p>
-          </div>
-        )}
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

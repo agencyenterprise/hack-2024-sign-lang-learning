@@ -25,6 +25,10 @@ html::-webkit-scrollbar {
   width: 0.6vw;
 }
 
+video {
+  height: auto;
+}
+
 html::-webkit-scrollbar-thumb {
   background-color: var(--color-subtext);
   border-radius: 70vw;
