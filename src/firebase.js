@@ -1,14 +1,15 @@
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
-import 'firebase/compat/firestore';
+import "firebase/compat/firestore";
 
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: "sign-language-ai.firebaseapp.com",
-  projectId: "sign-language-ai",
-  storageBucket: "sign-language-ai.appspot.com",
-  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGE_ID,
-  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  apiKey: "AIzaSyCP6DN_7w7O5bRPv7K2Y5rPVVX81woHoEw",
+  authDomain: "sign-language-test-e2e59.firebaseapp.com",
+  projectId: "sign-language-test-e2e59",
+  storageBucket: "sign-language-test-e2e59.firebasestorage.app",
+  messagingSenderId: "833934936859",
+  appId: "1:833934936859:web:d1ebe2138010cdc204e1be",
+  measurementId: "G-6QXD8MDGV9",
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -16,5 +17,4 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-export { firebase, auth, db};
-
+export { firebase, auth, db };

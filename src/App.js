@@ -32,7 +32,6 @@ const Layout = ({ children }) => {
 };
 
 function App() {
-  
   return (
     <div className="App">
       <Routes>
@@ -41,42 +40,13 @@ function App() {
           path="/"
           element={
             <Layout notifyMsg={notifyMsg}>
-              <Home />
-            </Layout>
-          }
-        />
-
-        <Route
-          exact
-          path="/detect"
-          element={
-            <Layout>
               <Detect />
-            </Layout>
-          }
-        />
-
-        <Route
-          exact
-          path="/dashboard"
-          element={
-            <Layout>
-              <Dashboard/>
             </Layout>
           }
         />
 
         <Route exact path="*" element={<NotFound />} />
       </Routes>
-
-      <ToastContainer
-        position="top-left"
-        autoClose={2000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        pauseOnHover
-      />
     </div>
   );
 }

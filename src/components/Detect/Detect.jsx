@@ -15,7 +15,7 @@ import { SignImageData } from "../../data/SignImageData";
 import { useDispatch, useSelector } from "react-redux";
 import { addSignData } from "../../redux/actions/signdataaction";
 import ProgressBar from "./ProgressBar/ProgressBar";
-
+import trainedModel from "../../assests/sign_language_recognizer_25-04-2023.task";
 import DisplayImg from "../../assests/displayGif.gif";
 
 let startTime = "";
@@ -214,8 +214,7 @@ const Detect = () => {
       );
       const recognizer = await GestureRecognizer.createFromOptions(vision, {
         baseOptions: {
-          modelAssetPath:
-            process.env.REACT_APP_FIREBASE_STORAGE_TRAINED_MODEL_25_04_2023,
+          modelAssetPath: trainedModel,
         },
         numHands: 2,
         runningMode: runningMode,
@@ -228,7 +227,7 @@ const Detect = () => {
   return (
     <>
       <div className="signlang_detection-container">
-        {accessToken ? (
+        {!accessToken ? (
           <>
             <div style={{ position: "relative" }}>
               <Webcam
@@ -267,15 +266,14 @@ const Detect = () => {
               </div>
             </div>
           </>
-        ) : 
-        (
+        ) : (
           <div className="signlang_detection_notLoggedIn">
-
-             <h1 className="gradient__text">Please Login !</h1>
-             <img src={DisplayImg} alt="diplay-img"/>
-             <p>
-              We Save Your Detection Data to show your progress and learning in dashboard, So please Login to Test this Detection Feature.
-             </p>
+            <h1 className="gradient__text">Please Login !</h1>
+            <img src={DisplayImg} alt="diplay-img" />
+            <p>
+              We Save Your Detection Data to show your progress and learning in
+              dashboard, So please Login to Test this Detection Feature.
+            </p>
           </div>
         )}
       </div>
