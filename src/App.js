@@ -1,14 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import "./App.css";
-import {
-  Navbar,
-  Footer,
-  Home,
-  Detect,
-  NotFound,
-  Dashboard,
-} from "./components";
-import { ToastContainer, toast } from "react-toastify";
+import { Detect, NotFound } from "./components";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const notifyMsg = (type, msg) => {

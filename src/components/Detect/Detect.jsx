@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import "./Detect.css";
-import { v4 as uuidv4 } from "uuid";
 import { FilesetResolver, GestureRecognizer } from "@mediapipe/tasks-vision";
 import {
   drawConnectors,
@@ -13,14 +12,11 @@ import { HAND_CONNECTIONS } from "@mediapipe/hands";
 import Webcam from "react-webcam";
 import { SignImageData } from "../../data/SignImageData";
 import { useDispatch, useSelector } from "react-redux";
-import { addSignData } from "../../redux/actions/signdataaction";
 import ProgressBar from "./ProgressBar/ProgressBar";
 import trainedModel from "../../assests/sign_language_recognizer_25-04-2023.task";
 import DisplayImg from "../../assests/displayGif.gif";
 
-let startTime = "";
-
-const originalWarn = console.warn;
+// const originalWarn = console.warn;
 console.warn = function (message) {
   // if (!message.includes("Feedback manager requires a model with a single signature inference")) {
   //   originalWarn.apply(console, arguments);
@@ -35,7 +31,7 @@ const Detect = () => {
   const [gestureRecognizer, setGestureRecognizer] = useState(null);
   const [runningMode, setRunningMode] = useState("IMAGE");
   const [progress, setProgress] = useState(0);
-  const [results, setResults] = useState(null);
+
   const requestRef = useRef();
   const prevGestureOutput = useRef("");
 
@@ -66,7 +62,7 @@ const Detect = () => {
   const dispatch = useDispatch();
 
   const [currentImage, setCurrentImage] = useState(null);
-
+  console.warning(currentImage);
   useEffect(() => {
     let intervalId;
     if (webcamRunning) {
@@ -136,7 +132,7 @@ const Detect = () => {
           SignDetected: results.gestures[0][0].categoryName,
         },
       ]);
-      setResults(results);
+      // setResults(results);
       setGestureOutput(results.gestures[0][0].categoryName);
       setProgress(Math.round(parseFloat(results.gestures[0][0].score) * 100));
     } else {
