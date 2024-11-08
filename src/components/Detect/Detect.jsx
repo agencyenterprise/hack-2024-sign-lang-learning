@@ -158,6 +158,17 @@ function checkCorrectGesture({ gestureOutput, currentLetter }) {
 
     return false;
   }
+
+  if (currentLetter.toLowerCase() === "n") {
+    if (
+      gestureOutput.toLowerCase() === "n" ||
+      gestureOutput.toLowerCase() === "yes"
+    ) {
+      return true;
+    }
+
+    return false;
+  }
   return gestureOutput.toLowerCase() === currentLetter.toLowerCase();
 }
 
@@ -184,6 +195,7 @@ const Detect = ({ customWord }) => {
   const [endTime, setEndTime] = useState(null);
   const [alwaysShowSigns, setAlwaysShowSigns] = useState(false);
   const [showHandTracking, setShowHandTracking] = useState(false);
+  const [isCameraReady, setIsCameraReady] = useState(false);
 
   const getWordsBasedOnDifficulty = () => {
     if (difficulty === Difficulty.EASY) {
@@ -436,6 +448,15 @@ const Detect = ({ customWord }) => {
     };
   }, [webcamRunning]);
 
+  const handleUserMedia = () => {
+    setIsCameraReady(true);
+  };
+
+  const handleCameraError = (error) => {
+    console.error("Camera error:", error);
+    setIsCameraReady(false);
+  };
+
   return (
     <div style={{ backgroundColor: "#1a1a1a", minHeight: "100vh" }}>
       <div
@@ -519,34 +540,58 @@ const Detect = ({ customWord }) => {
                 Let's Learn <br /> Sign Language!
               </div>
               {!webcamRunning && (
-                <button
-                  style={{
-                    padding: "20px 40px",
-                    width: "300px",
-                    backgroundColor: !webcamRunning ? "#4CAF50" : "#f44336",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "50px",
-                    cursor: "pointer",
-                    fontSize: "44px",
-                    fontWeight: "800",
-                    textTransform: "uppercase",
-                    boxShadow: "0 10px 20px rgba(0,0,0,0.2)",
-                    transition: "all 0.3s ease",
-                    transform: "scale(1)",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.transform = "scale(1.05)";
-                    e.target.style.boxShadow = "0 15px 25px rgba(0,0,0,0.3)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.transform = "scale(1)";
-                    e.target.style.boxShadow = "0 10px 20px rgba(0,0,0,0.2)";
-                  }}
-                  onClick={toggleDetection}
-                >
-                  {webcamRunning ? "Stop" : "Start"}
-                </button>
+                <>
+                  <button
+                    style={{
+                      padding: "20px 40px",
+                      width: "auto",
+                      backgroundColor: !isCameraReady ? "#666" : "#4CAF50",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "50px",
+                      cursor: isCameraReady ? "pointer" : "not-allowed",
+                      fontSize: "44px",
+                      fontWeight: "800",
+                      textTransform: "uppercase",
+                      boxShadow: isCameraReady
+                        ? "0 10px 20px rgba(0,0,0,0.2)"
+                        : "none",
+                      transition: "all 0.3s ease",
+                      transform: "scale(1)",
+                      opacity: isCameraReady ? 1 : 0.7,
+                    }}
+                    onMouseEnter={(e) => {
+                      if (isCameraReady) {
+                        e.target.style.transform = "scale(1.05)";
+                        e.target.style.boxShadow =
+                          "0 15px 25px rgba(0,0,0,0.3)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (isCameraReady) {
+                        e.target.style.transform = "scale(1)";
+                        e.target.style.boxShadow =
+                          "0 10px 20px rgba(0,0,0,0.2)";
+                      }
+                    }}
+                    onClick={() => isCameraReady && toggleDetection()}
+                    disabled={!isCameraReady}
+                  >
+                    {isCameraReady ? "Start" : "Connecting..."}
+                  </button>
+                  {!isCameraReady && (
+                    <div
+                      style={{
+                        marginTop: "20px",
+                        color: "#999",
+                        fontSize: "16px",
+                        textAlign: "center",
+                      }}
+                    >
+                      Please allow camera access to continue
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}
@@ -595,9 +640,10 @@ const Detect = ({ customWord }) => {
                   <Webcam
                     audio={false}
                     ref={webcamRef}
+                    onUserMedia={handleUserMedia}
+                    onUserMediaError={handleCameraError}
                     style={{
                       width: "100%",
-
                       borderRadius: "15px",
                       boxShadow: "0 10px 20px rgba(0,0,0,0.2)",
                     }}
@@ -637,11 +683,11 @@ function renderBasedOnDifficulty({
       <div
         style={{
           display: "flex",
-          fontSize: "175px",
+          fontSize: congratulations ? "100px" : "175px",
           fontWeight: "500",
           backgroundColor: "white",
           color: "black",
-          height: "200px",
+          height: congratulations ? "100px" : "200px",
         }}
         className="sign-text"
       >
