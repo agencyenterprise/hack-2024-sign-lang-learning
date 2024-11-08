@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import logo1 from "../assests/logo1.png";
 
 const Header = () => {
@@ -9,36 +9,38 @@ const Header = () => {
   return (
     <div style={styles.header}>
       <div style={styles.logo}>
-        <img style={styles.logo} src={logo1} alt="Logo" />
+        <Link to="/">
+          <img style={styles.logoImage} src={logo1} alt="Logo" />
+        </Link>
       </div>
       <nav style={styles.nav}>
-        <a
-          href="/"
+        <Link
+          to="/"
           style={{
             ...styles.link,
             ...(currentPath === "/" && styles.activeLink),
           }}
         >
           Home
-        </a>
-        <a
-          href="/spell"
+        </Link>
+        <Link
+          to="/spell"
           style={{
             ...styles.link,
             ...(currentPath === "/spell" && styles.activeLink),
           }}
         >
           Practice
-        </a>
-        <a
-          href="/custom"
+        </Link>
+        <Link
+          to="/custom"
           style={{
             ...styles.link,
             ...(currentPath === "/custom" && styles.activeLink),
           }}
         >
           Custom Word
-        </a>
+        </Link>
       </nav>
     </div>
   );
@@ -50,36 +52,47 @@ const styles = {
     top: 0,
     left: 0,
     width: "100%",
-    height: "60px",
+    height: "70px",
     display: "flex",
     alignItems: "center",
     justifyContent: "flex-start",
-    backgroundColor: "#333",
+    backgroundColor: "#1a1a1a",
     color: "#fff",
-    padding: "0 20px",
+    padding: "0 40px",
     zIndex: 1000,
-    boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
   },
   logo: {
+    marginRight: "60px",
+  },
+  logoImage: {
     width: "50px",
     height: "50px",
-    fontSize: "20px",
-    fontWeight: "bold",
-    marginRight: "40px",
+    transition: "transform 0.3s ease",
+    ":hover": {
+      transform: "scale(1.1)",
+    },
   },
   nav: {
     display: "flex",
-    gap: "30px",
+    gap: "40px",
   },
   link: {
     color: "#fff",
     textDecoration: "none",
-    fontSize: "20px",
-    transition: "color 0.3s",
+    fontSize: "18px",
+    fontWeight: "500",
+    padding: "8px 16px",
+    borderRadius: "8px",
+    transition: "all 0.3s ease",
+    ":hover": {
+      background: "rgba(255, 255, 255, 0.1)",
+    },
   },
   activeLink: {
-    color: "#1E90FF",
-    fontWeight: "bold",
+    background: "linear-gradient(45deg, #4CAF50, #2196F3)",
+    color: "#fff",
+    fontWeight: "600",
   },
 };
 
