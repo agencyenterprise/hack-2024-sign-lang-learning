@@ -23,30 +23,72 @@ console.warn = function (message) {
   // }
 };
 
+function getNonRepeatingWords(count = 5) {
+  //works well: "love" why hi
+  const conversationalWords = ["hackathon", "love", "why", "hi"];
+
+  // Filter words to ensure no repeated letters in sequence
+  const nonRepeatingWords = conversationalWords.filter((word) => {
+    for (let i = 0; i < word.length - 1; i++) {
+      if (word[i] === word[i + 1]) return false; // Skip words with repeated letters
+    }
+    return true;
+  });
+
+  const selectedWords = [];
+  for (let i = 0; i < count; i++) {
+    const randomIndex = Math.floor(Math.random() * nonRepeatingWords.length);
+    selectedWords.push(nonRepeatingWords[randomIndex]);
+  }
+
+  return selectedWords;
+}
+
+const Difficulty = {
+  EASY: "easy",
+  MEDIUM: "medium",
+  HARD: "hard",
+};
+
 const Detect = () => {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
+  const [showDynamicOutput, setShowDynamicOutput] = useState(false);
   const [webcamRunning, setWebcamRunning] = useState(false);
   const [gestureOutput, setGestureOutput] = useState("NONE");
   const [gestureRecognizer, setGestureRecognizer] = useState(null);
   const [runningMode, setRunningMode] = useState("IMAGE");
   const [progress, setProgress] = useState(0);
-
+  const [targetWord, setTargetWord] = useState("");
+  const [difficulty, setDifficulty] = useState(Difficulty.MEDIUM);
+  const [currentLetterIndex, setCurrentLetterIndex] = useState(0);
+  const [currentLetter, setCurrentLetter] = useState("");
+  const [congratulations, setCongratulations] = useState(false);
   const requestRef = useRef();
   const prevGestureOutput = useRef("");
 
   useEffect(() => {
-    console.error({ gestureOutput, progress, prev: prevGestureOutput.current });
+    const initialWord = getNonRepeatingWords(1)[0];
+    setTargetWord(initialWord);
+    setCurrentLetter(initialWord[0]);
+  }, []);
+
+  useEffect(() => {
+    console.error({ gestureOutput, progress, currentLetter });
     // This function will run only once when `gestureOutput` changes
     if (
       gestureOutput &&
-      gestureOutput !== prevGestureOutput.current &&
-      progress >= 80
+      // gestureOutput !== prevGestureOutput.current &&
+      progress >= 70
     ) {
-      // Place the function you want to run only once here
-      console.error(
-        `Detected new gesture: ${gestureOutput} ${progress} | prev gesture: ${prevGestureOutput.current}`
-      );
+      if (gestureOutput?.toLowerCase() === currentLetter?.toLowerCase()) {
+        if (currentLetterIndex < targetWord.length - 1) {
+          setCurrentLetter(targetWord.split("")[currentLetterIndex + 1]);
+          setCurrentLetterIndex((prev) => prev + 1);
+        } else {
+          setCongratulations(true);
+        }
+      }
 
       // Update the previous gesture output value
       prevGestureOutput.current = gestureOutput;
@@ -199,9 +241,68 @@ const Detect = () => {
 
   return (
     <>
-      <div className="signlang_detection-container">
+      <div
+        style={{
+          color: "white",
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          padding: "20px",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: "20px",
+          minHeight: "100vh",
+        }}
+      >
+        <div
+          style={{
+            fontSize: "20px",
+            fontWeight: "bold",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+
+            width: "100%",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "50px",
+              fontWeight: "bold",
+              marginBottom: "60px",
+            }}
+          >
+            {congratulations
+              ? "You did it! Congratulations!"
+              : "Try to spell this word:"}
+          </div>
+
+          <div>
+            <div style={{ display: "flex", gap: "10px" }}>
+              {targetWord.split("").map((letter, index) => (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "start",
+                    alignItems: "center",
+                  }}
+                >
+                  <div style={{ fontSize: "40px", fontWeight: "bold" }}>
+                    {letter.toUpperCase()}
+                  </div>
+                  {renderBasedOnDifficulty({
+                    letter,
+                    index: index,
+                    difficulty,
+                    currentLetterIndex,
+                  })}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
         {!accessToken ? (
-          <>
+          <div>
             <div style={{ position: "relative" }}>
               <Webcam
                 audio={false}
@@ -249,7 +350,7 @@ const Detect = () => {
                         fontSize: "20px",
                       }}
                     >
-                      {gestureOutput && webcamRunning ? (
+                      {webcamRunning && showDynamicOutput ? (
                         <div
                           style={{
                             display: "flex",
@@ -260,6 +361,7 @@ const Detect = () => {
                         >
                           <div
                             style={{
+                              minWidth: "150px",
                               height: "150px",
                               backgroundColor: "#ffffff",
                               border: "3px solid #3498db",
@@ -281,15 +383,6 @@ const Detect = () => {
                               }}
                             >
                               {gestureOutput}
-                            </span>
-                            <span
-                              style={{
-                                fontSize: "14px",
-                                color: "#7f8c8d",
-                                marginTop: "10px",
-                              }}
-                            >
-                              Detected Letter
                             </span>
                           </div>
                         </div>
@@ -377,7 +470,7 @@ const Detect = () => {
                 )}
               </div>
             </div> */}
-          </>
+          </div>
         ) : (
           <div className="signlang_detection_notLoggedIn">
             <h1 className="gradient__text">Please Login !</h1>
@@ -392,5 +485,50 @@ const Detect = () => {
     </>
   );
 };
+
+function renderBasedOnDifficulty({
+  letter,
+  index,
+  difficulty,
+  currentLetterIndex,
+}) {
+  if (difficulty === Difficulty.EASY) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          fontSize: "175px",
+          fontWeight: "500",
+          backgroundColor: "white",
+          color: "black",
+          height: "200px",
+        }}
+        className="sign-text"
+      >
+        {letter.toUpperCase()}
+      </div>
+    );
+  }
+  // console.error("index", index, "currentLetterIndex", currentLetterIndex);
+  if (difficulty === Difficulty.MEDIUM && index === currentLetterIndex) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          fontSize: "175px",
+          fontWeight: "500",
+          backgroundColor: "white",
+          color: "black",
+          height: "200px",
+        }}
+        className="sign-text"
+      >
+        {letter.toUpperCase()}
+      </div>
+    );
+  }
+
+  return null;
+}
 
 export default Detect;
