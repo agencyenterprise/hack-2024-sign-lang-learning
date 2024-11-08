@@ -18,7 +18,7 @@
 }
 
 body {
-  background: var(--color-bg);
+  background: #000;
 }
 
 html::-webkit-scrollbar {

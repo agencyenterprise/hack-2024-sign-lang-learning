@@ -6,26 +6,33 @@ import {
   drawLandmarks,
   // HAND_CONNECTIONS,
 } from "@mediapipe/drawing_utils";
-
+import Header from "../header";
 import { HAND_CONNECTIONS } from "@mediapipe/hands";
 
 import Webcam from "react-webcam";
 import { SignImageData } from "../../data/SignImageData";
 import { useDispatch, useSelector } from "react-redux";
 import ProgressBar from "./ProgressBar/ProgressBar";
+import ConfigPanel from "../ConfigPanel";
 // import trainedModel from "../../assests/sign_language_recognizer_25-04-2023.task";
 import DisplayImg from "../../assests/displayGif.gif";
-
+import WordDisplay from "../WordDisplay";
+const baseWords = ["hackathon", "love", "why", "hi"];
 // const originalWarn = console.warn;
+
 console.warn = function (message) {
   // if (!message.includes("Feedback manager requires a model with a single signature inference")) {
   //   originalWarn.apply(console, arguments);
   // }
 };
 
+function shuffleArray(array) {
+  return array.sort(() => Math.random() - 0.5);
+}
+
 function getNonRepeatingWords(count = 5) {
   //works well: "love" why hi
-  const conversationalWords = ["hackathon", "love", "why", "hi"];
+  const conversationalWords = baseWords;
 
   // Filter words to ensure no repeated letters in sequence
   const nonRepeatingWords = conversationalWords.filter((word) => {
@@ -50,6 +57,74 @@ const Difficulty = {
   HARD: "hard",
 };
 
+const LoadingModal = ({ isOpen }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "#000",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 1000,
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: "#1a1a1a",
+          padding: "2rem",
+          borderRadius: "10px",
+          textAlign: "center",
+        }}
+      >
+        <div
+          style={{
+            marginBottom: "10px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "40px",
+            fontWeight: "bold",
+            flexDirection: "column",
+            color: "white",
+          }}
+        >
+          Loading Model...
+          <span style={{ fontSize: "24px", color: "#7f8c8d" }}>
+            This may take a minute
+          </span>
+        </div>
+        <div
+          style={{
+            border: "2px solid #f3f3f3",
+            borderTop: "2px solid #3498db",
+            borderRadius: "50%",
+            width: "40px",
+            height: "40px",
+            animation: "spin 1s linear infinite",
+            margin: "0 auto",
+          }}
+        >
+          <style>
+            {`
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+            `}
+          </style>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Detect = () => {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
@@ -60,15 +135,22 @@ const Detect = () => {
   const [runningMode, setRunningMode] = useState("IMAGE");
   const [progress, setProgress] = useState(0);
   const [targetWord, setTargetWord] = useState("");
+  const [currentWords, setCurrentWords] = useState([]);
   const [difficulty, setDifficulty] = useState(Difficulty.MEDIUM);
   const [currentLetterIndex, setCurrentLetterIndex] = useState(0);
   const [currentLetter, setCurrentLetter] = useState("");
   const [congratulations, setCongratulations] = useState(false);
   const requestRef = useRef();
   const prevGestureOutput = useRef("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [startTime, setStartTime] = useState(null);
+  const [endTime, setEndTime] = useState(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
 
   useEffect(() => {
-    const initialWord = getNonRepeatingWords(1)[0];
+    const shuffledWords = shuffleArray(baseWords);
+    const initialWord = shuffledWords[0];
+    setCurrentWords(shuffleArray(baseWords));
     setTargetWord(initialWord);
     setCurrentLetter(initialWord[0]);
   }, []);
@@ -86,6 +168,12 @@ const Detect = () => {
           setCurrentLetter(targetWord.split("")[currentLetterIndex + 1]);
           setCurrentLetterIndex((prev) => prev + 1);
         } else {
+          if (!congratulations) {
+            setEndTime(Date.now());
+            setElapsedTime(
+              Math.floor(((endTime || Date.now()) - startTime) / 1000)
+            );
+          }
           setCongratulations(true);
         }
       }
@@ -192,7 +280,7 @@ const Detect = () => {
     predictWebcam();
   }, [predictWebcam]);
 
-  const enableCam = useCallback(() => {
+  const toggleDetection = useCallback(() => {
     // if (!gestureRecognizer) {
     //   alert("Please wait for gestureRecognizer to load");
     //   return;
@@ -203,6 +291,7 @@ const Detect = () => {
       cancelAnimationFrame(requestRef.current);
     } else {
       setWebcamRunning(true);
+      setStartTime(Date.now());
       requestRef.current = requestAnimationFrame(animate);
     }
   }, [
@@ -229,6 +318,7 @@ const Detect = () => {
         runningMode: runningMode,
       });
       setGestureRecognizer(recognizer);
+      setIsLoading(false);
     }
     loadGestureRecognizer();
   }, [runningMode]);
@@ -239,162 +329,161 @@ const Detect = () => {
     }
   }, [gestureOutput]);
 
+  function changeDifficulty(difficulty) {
+    setDifficulty(difficulty);
+  }
+
+  function changeDetectionVisibility(isVisible) {
+    setShowDynamicOutput(isVisible);
+  }
+
   return (
     <>
+      <Header />
+      <LoadingModal isOpen={isLoading} />
+      <ConfigPanel
+        onDifficultyChange={changeDifficulty}
+        onDetectionVisibilityChange={changeDetectionVisibility}
+        toggleDetection={toggleDetection}
+        webcamRunning={webcamRunning}
+      />
+      <div style={{ height: "20px" }} />
       <div
         style={{
           color: "white",
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
-          padding: "20px",
           justifyContent: "center",
           alignItems: "center",
           gap: "20px",
-          minHeight: "100vh",
         }}
       >
-        <div
-          style={{
-            fontSize: "20px",
-            fontWeight: "bold",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-
-            width: "100%",
-          }}
-        >
+        {webcamRunning ? (
+          <>
+            <WordDisplay
+              targetWord={targetWord}
+              currentLetterIndex={currentLetterIndex}
+              congratulations={congratulations}
+              renderBasedOnDifficulty={renderBasedOnDifficulty}
+              difficulty={difficulty}
+              time={Math.floor(((endTime || Date.now()) - startTime) / 1000)}
+            />
+          </>
+        ) : (
           <div
             style={{
-              fontSize: "50px",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              fontSize: "20px",
               fontWeight: "bold",
-              marginBottom: "60px",
             }}
           >
-            {congratulations
-              ? "You did it! Congratulations!"
-              : "Try to spell this word:"}
-          </div>
-
-          <div>
-            <div style={{ display: "flex", gap: "10px" }}>
-              {targetWord.split("").map((letter, index) => (
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "start",
-                    alignItems: "center",
-                  }}
-                >
-                  <div style={{ fontSize: "40px", fontWeight: "bold" }}>
-                    {letter.toUpperCase()}
-                  </div>
-                  {renderBasedOnDifficulty({
-                    letter,
-                    index: index,
-                    difficulty,
-                    currentLetterIndex,
-                  })}
-                </div>
-              ))}
+            <div
+              style={{
+                fontSize: "48px",
+                fontWeight: "800",
+                color: "#fff",
+                textShadow: "3px 3px 0 rgba(0,0,0,0.2)",
+                marginBottom: "30px",
+                letterSpacing: "2px",
+                textAlign: "center",
+              }}
+            >
+              Let's Learn <br /> Sign Language!
             </div>
+            <button
+              style={{
+                padding: "20px 40px",
+                width: "300px",
+                backgroundColor: !webcamRunning ? "#4CAF50" : "#f44336",
+                color: "white",
+                border: "none",
+                borderRadius: "50px",
+                cursor: "pointer",
+                fontSize: "44px",
+                fontWeight: "800",
+                textTransform: "uppercase",
+                boxShadow: "0 10px 20px rgba(0,0,0,0.2)",
+                transition: "all 0.3s ease",
+                transform: "scale(1)",
+                ":hover": {
+                  transform: "scale(1.05)",
+                  boxShadow: "0 15px 25px rgba(0,0,0,0.3)",
+                },
+              }}
+              onClick={toggleDetection}
+            >
+              {webcamRunning ? "Stop" : "Start"}
+            </button>
           </div>
-        </div>
+        )}
         {!accessToken ? (
-          <div>
-            <div style={{ position: "relative" }}>
-              <Webcam
-                audio={false}
-                ref={webcamRef}
-                // screenshotFormat="image/jpeg"
-                className="signlang_webcam"
-              />
-              <canvas ref={canvasRef} className="signlang_canvas" />
+          <div style={{ width: "600px", position: "relative" }}>
+            {gestureRecognizer ? (
               <div
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "100%",
+                  alignItems: "flex-start",
+                  justifyContent: "flex-end",
                 }}
               >
-                {gestureRecognizer ? (
-                  <>
-                    <button
-                      style={{
-                        padding: "10px 20px",
-                        backgroundColor: !webcamRunning ? "#3498db" : "#e74c3c",
-                        color: "white",
-                        borderRadius: "8px",
-                        cursor: "pointer",
-                        fontFamily: "sans-serif",
-                        fontSize: "14px",
-                        fontWeight: "500",
-                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                        transition: "all 0.2s ease",
-                        userSelect: "none",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        minWidth: "100px",
-                      }}
-                      onClick={enableCam}
-                    >
-                      {webcamRunning ? "Stop" : "Start"}
-                    </button>
+                <div
+                  style={{
+                    color: "white",
+                    fontSize: "20px",
+                  }}
+                >
+                  {showDynamicOutput ? (
                     <div
                       style={{
-                        color: "white",
-                        fontSize: "20px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: "20px",
+                        position: "relative",
                       }}
                     >
-                      {webcamRunning && showDynamicOutput ? (
-                        <div
+                      <div
+                        style={{
+                          width: "600px",
+                          height: "100px",
+                          border: "2px solid #fff",
+                          background: "#000",
+                          borderRadius: "30px",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
+                          position: "relative",
+                          overflow: "hidden",
+                        }}
+                      >
+                        <span
                           style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            gap: "20px",
+                            fontSize: "80px",
+                            fontWeight: "800",
+                            color: "#fff",
+                            textShadow: "3px 3px 0 rgba(0,0,0,0.2)",
+                            letterSpacing: "4px",
+                            animation: "float 3s ease-in-out infinite",
                           }}
                         >
-                          <div
-                            style={{
-                              minWidth: "150px",
-                              height: "150px",
-                              backgroundColor: "#ffffff",
-                              border: "3px solid #3498db",
-                              borderRadius: "15px",
-                              display: "flex",
-                              flexDirection: "column",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
-                              padding: "10px",
-                            }}
-                          >
-                            <span
-                              style={{
-                                fontSize: "80px",
-                                fontWeight: "bold",
-                                color: "#2c3e50",
-                                fontFamily: "Arial, sans-serif",
-                              }}
-                            >
-                              {gestureOutput}
-                            </span>
-                          </div>
-                        </div>
-                      ) : (
-                        <div
-                          style={{
-                            height: "20px",
-                          }}
-                        />
-                      )}
+                          {gestureOutput}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      style={{
+                        height: "20px",
+                      }}
+                    />
+                  )}
 
-                      {/* {progress ? (
+                  {/* {progress ? (
                         <ProgressBar progress={progress} />
                       ) : (
                         <div
@@ -403,60 +492,33 @@ const Detect = () => {
                           }}
                         />
                       )} */}
-                    </div>
-                  </>
-                ) : (
-                  <div
-                    style={{
-                      color: "white",
-                      fontSize: "20px",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <div
-                      style={{
-                        marginBottom: "10px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: "40px",
-                        fontWeight: "bold",
-                        flexDirection: "column",
-                      }}
-                    >
-                      Loading Model...
-                      <span style={{ fontSize: "24px", color: "#7f8c8d" }}>
-                        This may take a minute
-                      </span>
-                    </div>
-                    <div
-                      style={{
-                        border: "2px solid #f3f3f3",
-                        borderTop: "2px solid #3498db",
-                        borderRadius: "50%",
-                        width: "40px",
-                        height: "40px",
-                        animation: "spin 1s linear infinite",
-                        position: "relative",
-                      }}
-                    >
-                      <style>
-                        {`
-                      @keyframes spin {
-                        0% { transform: rotate(0deg); }
-                        100% { transform: rotate(360deg); }
-                      }
-                    `}
-                      </style>
-                    </div>
-                  </div>
-                )}
+                </div>
               </div>
+            ) : null}
+            <div style={{ position: "relative" }}>
+              <Webcam
+                audio={false}
+                ref={webcamRef}
+                // screenshotFormat="image/jpeg"
+                className="signlang_webcam"
+              />
+              <canvas
+                style={{
+                  display: showDynamicOutput ? "block" : "none",
+                }}
+                ref={canvasRef}
+                className="signlang_canvas"
+              />
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "100%",
+                }}
+              ></div>
             </div>
-
             {/* <div className="signlang_imagelist-container">
               <h2 className="gradient__text">Image</h2>
 
@@ -491,8 +553,9 @@ function renderBasedOnDifficulty({
   index,
   difficulty,
   currentLetterIndex,
+  congratulations,
 }) {
-  if (difficulty === Difficulty.EASY) {
+  if (difficulty === Difficulty.EASY || congratulations) {
     return (
       <div
         style={{
