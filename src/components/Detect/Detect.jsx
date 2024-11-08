@@ -135,7 +135,7 @@ function checkCorrectGesture({ gestureOutput, currentLetter }) {
   return gestureOutput.toLowerCase() === currentLetter.toLowerCase();
 }
 
-const Detect = () => {
+const Detect = ({ customWord }) => {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
   const [showDynamicOutput, setShowDynamicOutput] = useState(false);
@@ -172,15 +172,24 @@ const Detect = () => {
   };
 
   useEffect(() => {
-    const words = getWordsBasedOnDifficulty();
-    const initialWord = words[0];
-    setCurrentWords(words);
-    setTargetWord(initialWord);
-    setCurrentLetter(initialWord[0]);
-    setCurrentLetterIndex(0);
-    setCurrentWordIndex(0);
-    setCongratulations(false);
-  }, [difficulty]);
+    if (customWord) {
+      setCurrentWords([customWord]);
+      setTargetWord(customWord);
+      setCurrentLetter(customWord[0]);
+      setCurrentLetterIndex(0);
+      setCurrentWordIndex(0);
+      setCongratulations(false);
+    } else {
+      const words = getWordsBasedOnDifficulty();
+      const initialWord = words[0];
+      setCurrentWords(words);
+      setTargetWord(initialWord);
+      setCurrentLetter(initialWord[0]);
+      setCurrentLetterIndex(0);
+      setCurrentWordIndex(0);
+      setCongratulations(false);
+    }
+  }, [difficulty, customWord]);
 
   useEffect(() => {
     console.error({ gestureOutput, progress, currentLetter });
@@ -406,6 +415,7 @@ const Detect = () => {
         onHandTrackingVisibilityChange={changeHandTrackingVisibility}
         toggleDetection={toggleDetection}
         webcamRunning={webcamRunning}
+        isCustomWord={!!customWord}
       />
       <div style={{ height: "20px" }} />
       <div

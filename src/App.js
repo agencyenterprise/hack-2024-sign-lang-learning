@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import { Detect, NotFound } from "./components";
 import LandingPage from "./components/LandingPage";
+import CustomWordDetect from "./components/CustomWordDetect";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -38,6 +39,15 @@ function App() {
           element={
             <Layout notifyMsg={notifyMsg}>
               <Detect />
+            </Layout>
+          }
+        />
+        <Route
+          exact
+          path="/custom"
+          element={
+            <Layout notifyMsg={notifyMsg}>
+              <CustomWordDetect />
             </Layout>
           }
         />

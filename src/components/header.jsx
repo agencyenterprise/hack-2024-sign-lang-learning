@@ -9,7 +9,7 @@ const Header = () => {
   return (
     <div style={styles.header}>
       <div style={styles.logo}>
-        <img style={styles.logo} src={logo1} />
+        <img style={styles.logo} src={logo1} alt="Logo" />
       </div>
       <nav style={styles.nav}>
         <a
@@ -28,25 +28,16 @@ const Header = () => {
             ...(currentPath === "/spell" && styles.activeLink),
           }}
         >
-          Spell Out
+          Practice
         </a>
         <a
-          href="#services"
+          href="/custom"
           style={{
             ...styles.link,
-            ...(currentPath === "/services" && styles.activeLink),
+            ...(currentPath === "/custom" && styles.activeLink),
           }}
         >
-          Services
-        </a>
-        <a
-          href="#contact"
-          style={{
-            ...styles.link,
-            ...(currentPath === "/contact" && styles.activeLink),
-          }}
-        >
-          Contact
+          Custom Word
         </a>
       </nav>
     </div>

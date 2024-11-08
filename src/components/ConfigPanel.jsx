@@ -6,6 +6,7 @@ const ConfigPanel = ({
   onHandTrackingVisibilityChange,
   toggleDetection,
   webcamRunning,
+  isCustomWord,
 }) => {
   const [selectedDifficulty, setSelectedDifficulty] = useState("medium");
   const [showDetection, setShowDetection] = useState(false);
@@ -28,25 +29,27 @@ const ConfigPanel = ({
 
   return (
     <div style={styles.container}>
-      <div style={styles.section}>
-        <h3 style={styles.sectionTitle}>Difficulty Level</h3>
-        <div style={styles.buttonGroup}>
-          {["easy", "medium", "hard", "darkSouls"].map((difficulty) => (
-            <button
-              key={difficulty}
-              style={{
-                ...styles.button,
-                ...(selectedDifficulty === difficulty
-                  ? styles.activeButton
-                  : {}),
-              }}
-              onClick={() => handleDifficultyChange(difficulty)}
-            >
-              {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
-            </button>
-          ))}
+      {!isCustomWord && (
+        <div style={styles.section}>
+          <h3 style={styles.sectionTitle}>Difficulty Level</h3>
+          <div style={styles.buttonGroup}>
+            {["easy", "medium", "hard", "darkSouls"].map((difficulty) => (
+              <button
+                key={difficulty}
+                style={{
+                  ...styles.button,
+                  ...(selectedDifficulty === difficulty
+                    ? styles.activeButton
+                    : {}),
+                }}
+                onClick={() => handleDifficultyChange(difficulty)}
+              >
+                {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <div style={styles.section}>
         <h3 style={styles.sectionTitle}>Realtime Feedback</h3>
@@ -99,7 +102,7 @@ const styles = {
     padding: "20px",
     paddingLeft: "100px",
     backgroundColor: "#ccc",
-    marginTop: "60px", // To account for the fixed header
+    marginTop: "60px",
     display: "flex",
     justifyContent: "start",
     gap: "40px",
