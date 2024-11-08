@@ -148,6 +148,16 @@ function checkCorrectGesture({ gestureOutput, currentLetter }) {
 
     return false;
   }
+  if (currentLetter.toLowerCase() === "g") {
+    if (
+      gestureOutput.toLowerCase() === "g" ||
+      gestureOutput.toLowerCase() === "m"
+    ) {
+      return true;
+    }
+
+    return false;
+  }
   return gestureOutput.toLowerCase() === currentLetter.toLowerCase();
 }
 
@@ -213,7 +223,7 @@ const Detect = ({ customWord }) => {
     if (
       gestureOutput &&
       // gestureOutput !== prevGestureOutput.current &&
-      progress >= 70
+      (progress >= 70 || gestureOutput.toLowerCase() === "g")
     ) {
       if (
         checkCorrectGesture({
@@ -335,28 +345,25 @@ const Detect = ({ customWord }) => {
   }, [predictWebcam]);
 
   const toggleDetection = useCallback(() => {
-    // if (!gestureRecognizer) {
-    //   alert("Please wait for gestureRecognizer to load");
-    //   return;
-    // }
-
     if (webcamRunning === true) {
       setWebcamRunning(false);
-      cancelAnimationFrame(requestRef.current);
+      if (requestRef.current) {
+        cancelAnimationFrame(requestRef.current);
+      }
+      if (webcamRef.current && webcamRef.current.video) {
+        const stream = webcamRef.current.video.srcObject;
+        if (stream) {
+          const tracks = stream.getTracks();
+          tracks.forEach((track) => track.stop());
+        }
+        webcamRef.current.video.srcObject = null;
+      }
     } else {
       setWebcamRunning(true);
       setStartTime(Date.now());
       requestRef.current = requestAnimationFrame(animate);
     }
-  }, [
-    webcamRunning,
-    gestureRecognizer,
-    animate,
-    detectedData,
-    user?.name,
-    user?.userId,
-    dispatch,
-  ]);
+  }, [webcamRunning, animate]);
 
   useEffect(() => {
     async function loadGestureRecognizer() {
@@ -408,6 +415,26 @@ const Detect = ({ customWord }) => {
       window.removeEventListener("keydown", handleKeyPress);
     };
   }, [alwaysShowSigns]);
+
+  useEffect(() => {
+    return () => {
+      // Cleanup function
+      if (webcamRunning) {
+        setWebcamRunning(false);
+        if (requestRef.current) {
+          cancelAnimationFrame(requestRef.current);
+        }
+        if (webcamRef.current && webcamRef.current.video) {
+          const stream = webcamRef.current.video.srcObject;
+          if (stream) {
+            const tracks = stream.getTracks();
+            tracks.forEach((track) => track.stop());
+          }
+          webcamRef.current.video.srcObject = null;
+        }
+      }
+    };
+  }, [webcamRunning]);
 
   return (
     <div style={{ backgroundColor: "#1a1a1a", minHeight: "100vh" }}>
