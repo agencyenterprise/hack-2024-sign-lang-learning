@@ -37,12 +37,10 @@ const ConfigPanel = ({
               {["easy", "medium", "hard", "darkSouls"].map((difficulty) => (
                 <button
                   key={difficulty}
-                  style={{
-                    ...styles.button,
-                    ...(selectedDifficulty === difficulty
-                      ? styles.activeButton
-                      : {}),
-                  }}
+                  className={`config-button ${
+                    selectedDifficulty === difficulty ? "active" : ""
+                  }`}
+                  style={styles.button}
                   onClick={() => handleDifficultyChange(difficulty)}
                 >
                   {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
@@ -55,10 +53,8 @@ const ConfigPanel = ({
         <div style={styles.section}>
           <h3 style={styles.sectionTitle}>Realtime Feedback</h3>
           <button
-            style={{
-              ...styles.button,
-              ...(showDetection ? styles.activeButton : {}),
-            }}
+            className={`config-button ${showDetection ? "active" : ""}`}
+            style={styles.button}
             onClick={handleDetectionToggle}
           >
             {showDetection ? "Hide" : "Show"}
@@ -68,10 +64,8 @@ const ConfigPanel = ({
         <div style={styles.section}>
           <h3 style={styles.sectionTitle}>Hand Tracking</h3>
           <button
-            style={{
-              ...styles.button,
-              ...(showHandTracking ? styles.activeButton : {}),
-            }}
+            className={`config-button ${showHandTracking ? "active" : ""}`}
+            style={styles.button}
             onClick={handleHandTrackingToggle}
           >
             {showHandTracking ? "Hide" : "Show"}
@@ -84,7 +78,7 @@ const ConfigPanel = ({
             <button
               style={{
                 ...styles.button,
-                backgroundColor: "#f44336",
+                background: "#f44336",
                 color: "#fff",
                 border: "none",
                 boxShadow: "0 4px 15px rgba(244, 67, 54, 0.3)",
@@ -145,7 +139,7 @@ const styles = {
     transition: "all 0.3s ease",
     textTransform: "uppercase",
     letterSpacing: "0.5px",
-    ":hover": {
+    "&:hover": {
       backgroundColor: "rgba(255, 255, 255, 0.2)",
     },
   },

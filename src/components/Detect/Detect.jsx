@@ -491,34 +491,36 @@ const Detect = ({ customWord }) => {
               >
                 Let's Learn <br /> Sign Language!
               </div>
-              <button
-                style={{
-                  padding: "20px 40px",
-                  width: "300px",
-                  backgroundColor: !webcamRunning ? "#4CAF50" : "#f44336",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "50px",
-                  cursor: "pointer",
-                  fontSize: "44px",
-                  fontWeight: "800",
-                  textTransform: "uppercase",
-                  boxShadow: "0 10px 20px rgba(0,0,0,0.2)",
-                  transition: "all 0.3s ease",
-                  transform: "scale(1)",
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.transform = "scale(1.05)";
-                  e.target.style.boxShadow = "0 15px 25px rgba(0,0,0,0.3)";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.transform = "scale(1)";
-                  e.target.style.boxShadow = "0 10px 20px rgba(0,0,0,0.2)";
-                }}
-                onClick={toggleDetection}
-              >
-                {webcamRunning ? "Stop" : "Start"}
-              </button>
+              {!webcamRunning && (
+                <button
+                  style={{
+                    padding: "20px 40px",
+                    width: "300px",
+                    backgroundColor: !webcamRunning ? "#4CAF50" : "#f44336",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "50px",
+                    cursor: "pointer",
+                    fontSize: "44px",
+                    fontWeight: "800",
+                    textTransform: "uppercase",
+                    boxShadow: "0 10px 20px rgba(0,0,0,0.2)",
+                    transition: "all 0.3s ease",
+                    transform: "scale(1)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = "scale(1.05)";
+                    e.target.style.boxShadow = "0 15px 25px rgba(0,0,0,0.3)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = "scale(1)";
+                    e.target.style.boxShadow = "0 10px 20px rgba(0,0,0,0.2)";
+                  }}
+                  onClick={toggleDetection}
+                >
+                  {webcamRunning ? "Stop" : "Start"}
+                </button>
+              )}
             </div>
           )}
 
