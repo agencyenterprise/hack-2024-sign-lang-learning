@@ -62,7 +62,7 @@ const Detect = () => {
   const dispatch = useDispatch();
 
   const [currentImage, setCurrentImage] = useState(null);
-  console.warning(currentImage);
+  // console.warning(currentImage);
   useEffect(() => {
     let intervalId;
     if (webcamRunning) {
