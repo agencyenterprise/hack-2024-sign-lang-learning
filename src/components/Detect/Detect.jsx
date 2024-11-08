@@ -20,16 +20,42 @@ import DisplayImg from "../../assests/displayGif.gif";
 
 let startTime = "";
 
+const originalWarn = console.warn;
+console.warn = function (message) {
+  // if (!message.includes("Feedback manager requires a model with a single signature inference")) {
+  //   originalWarn.apply(console, arguments);
+  // }
+};
+
 const Detect = () => {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
   const [webcamRunning, setWebcamRunning] = useState(false);
-  const [gestureOutput, setGestureOutput] = useState("");
+  const [gestureOutput, setGestureOutput] = useState("NONE");
   const [gestureRecognizer, setGestureRecognizer] = useState(null);
   const [runningMode, setRunningMode] = useState("IMAGE");
   const [progress, setProgress] = useState(0);
-
+  const [results, setResults] = useState(null);
   const requestRef = useRef();
+  const prevGestureOutput = useRef("");
+
+  useEffect(() => {
+    console.error({ gestureOutput, progress, prev: prevGestureOutput.current });
+    // This function will run only once when `gestureOutput` changes
+    if (
+      gestureOutput &&
+      gestureOutput !== prevGestureOutput.current &&
+      progress >= 80
+    ) {
+      // Place the function you want to run only once here
+      console.error(
+        `Detected new gesture: ${gestureOutput} ${progress} | prev gesture: ${prevGestureOutput.current}`
+      );
+
+      // Update the previous gesture output value
+      prevGestureOutput.current = gestureOutput;
+    }
+  }, [gestureOutput, progress]);
 
   const [detectedData, setDetectedData] = useState([]);
 
@@ -110,12 +136,12 @@ const Detect = () => {
           SignDetected: results.gestures[0][0].categoryName,
         },
       ]);
-
+      setResults(results);
       setGestureOutput(results.gestures[0][0].categoryName);
       setProgress(Math.round(parseFloat(results.gestures[0][0].score) * 100));
     } else {
-      setGestureOutput("");
-      setProgress("");
+      setGestureOutput(prevGestureOutput.current);
+      setProgress(0);
     }
 
     if (webcamRunning === true) {
@@ -137,64 +163,8 @@ const Detect = () => {
     if (webcamRunning === true) {
       setWebcamRunning(false);
       cancelAnimationFrame(requestRef.current);
-      setCurrentImage(null);
-
-      const endTime = new Date();
-
-      const timeElapsed = (
-        (endTime.getTime() - startTime.getTime()) /
-        1000
-      ).toFixed(2);
-
-      // Remove empty values
-      const nonEmptyData = detectedData.filter(
-        (data) => data.SignDetected !== "" && data.DetectedScore !== ""
-      );
-
-      //to filter continous same signs in an array
-      const resultArray = [];
-      let current = nonEmptyData[0];
-
-      for (let i = 1; i < nonEmptyData.length; i++) {
-        if (nonEmptyData[i].SignDetected !== current.SignDetected) {
-          resultArray.push(current);
-          current = nonEmptyData[i];
-        }
-      }
-
-      resultArray.push(current);
-
-      //calculate count for each repeated sign
-      const countMap = new Map();
-
-      for (const item of resultArray) {
-        const count = countMap.get(item.SignDetected) || 0;
-        countMap.set(item.SignDetected, count + 1);
-      }
-
-      const sortedArray = Array.from(countMap.entries()).sort(
-        (a, b) => b[1] - a[1]
-      );
-
-      const outputArray = sortedArray
-        .slice(0, 5)
-        .map(([sign, count]) => ({ SignDetected: sign, count }));
-
-      // object to send to action creator
-      const data = {
-        signsPerformed: outputArray,
-        id: uuidv4(),
-        username: user?.name,
-        userId: user?.userId,
-        createdAt: String(endTime),
-        secondsSpent: Number(timeElapsed),
-      };
-
-      dispatch(addSignData(data));
-      setDetectedData([]);
     } else {
       setWebcamRunning(true);
-      startTime = new Date();
       requestRef.current = requestAnimationFrame(animate);
     }
   }, [
@@ -224,6 +194,12 @@ const Detect = () => {
     loadGestureRecognizer();
   }, [runningMode]);
 
+  useEffect(() => {
+    if (gestureOutput) {
+      // alert(gestureOutput);
+    }
+  }, [gestureOutput]);
+
   return (
     <>
       <div className="signlang_detection-container">
@@ -236,23 +212,53 @@ const Detect = () => {
                 // screenshotFormat="image/jpeg"
                 className="signlang_webcam"
               />
-
               <canvas ref={canvasRef} className="signlang_canvas" />
-
-              <div className="signlang_data-container">
-                <button onClick={enableCam}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "100%",
+                }}
+              >
+                <button
+                  style={{ marginBottom: "10px", width: "60px" }}
+                  onClick={enableCam}
+                >
                   {webcamRunning ? "Stop" : "Start"}
                 </button>
 
-                <div className="signlang_data">
-                  <p className="gesture_output">{gestureOutput}</p>
+                <div
+                  style={{
+                    color: "white",
+                    fontSize: "20px",
+                  }}
+                >
+                  {gestureOutput ? (
+                    <p className="gesture_output">{gestureOutput}</p>
+                  ) : (
+                    <div
+                      style={{
+                        height: "20px",
+                      }}
+                    />
+                  )}
 
-                  {progress ? <ProgressBar progress={progress} /> : null}
+                  {progress ? (
+                    <ProgressBar progress={progress} />
+                  ) : (
+                    <div
+                      style={{
+                        height: "20px",
+                      }}
+                    />
+                  )}
                 </div>
               </div>
             </div>
 
-            <div className="signlang_imagelist-container">
+            {/* <div className="signlang_imagelist-container">
               <h2 className="gradient__text">Image</h2>
 
               <div className="signlang_image-div">
@@ -264,7 +270,7 @@ const Detect = () => {
                   </h3>
                 )}
               </div>
-            </div>
+            </div> */}
           </>
         ) : (
           <div className="signlang_detection_notLoggedIn">

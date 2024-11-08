@@ -24,9 +24,9 @@ const notifyMsg = (type, msg) => {
 const Layout = ({ children }) => {
   return (
     <>
-      <Navbar notifyMsg={notifyMsg} />
+      {/* <Navbar notifyMsg={notifyMsg} /> */}
       {children}
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 };
