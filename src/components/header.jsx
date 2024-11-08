@@ -1,22 +1,51 @@
 import React from "react";
+import { useLocation } from "react-router-dom";
 import logo1 from "../assests/logo1.png";
+
 const Header = () => {
+  const location = useLocation();
+  const currentPath = location.pathname;
+
   return (
     <div style={styles.header}>
       <div style={styles.logo}>
         <img style={styles.logo} src={logo1} />
       </div>
       <nav style={styles.nav}>
-        <a href="#home" style={styles.link}>
+        <a
+          href="/"
+          style={{
+            ...styles.link,
+            ...(currentPath === "/" && styles.activeLink),
+          }}
+        >
           Home
         </a>
-        <a href="#about" style={styles.link}>
-          About
+        <a
+          href="/spell"
+          style={{
+            ...styles.link,
+            ...(currentPath === "/spell" && styles.activeLink),
+          }}
+        >
+          Spell Out
         </a>
-        <a href="#services" style={styles.link}>
+        <a
+          href="#services"
+          style={{
+            ...styles.link,
+            ...(currentPath === "/services" && styles.activeLink),
+          }}
+        >
           Services
         </a>
-        <a href="#contact" style={styles.link}>
+        <a
+          href="#contact"
+          style={{
+            ...styles.link,
+            ...(currentPath === "/contact" && styles.activeLink),
+          }}
+        >
           Contact
         </a>
       </nav>
@@ -33,7 +62,7 @@ const styles = {
     height: "60px",
     display: "flex",
     alignItems: "center",
-    justifyContent: "flex-start", // Changed from space-between to flex-start
+    justifyContent: "flex-start",
     backgroundColor: "#333",
     color: "#fff",
     padding: "0 20px",
@@ -45,20 +74,21 @@ const styles = {
     height: "50px",
     fontSize: "20px",
     fontWeight: "bold",
-    marginRight: "40px", // Added margin to separate logo from nav
+    marginRight: "40px",
   },
   nav: {
     display: "flex",
-    gap: "30px", // Increased gap between links
+    gap: "30px",
   },
   link: {
     color: "#fff",
     textDecoration: "none",
-    fontSize: "20px", // Increased font size from 16px to 20px
+    fontSize: "20px",
     transition: "color 0.3s",
   },
-  linkHover: {
+  activeLink: {
     color: "#1E90FF",
+    fontWeight: "bold",
   },
 };
 

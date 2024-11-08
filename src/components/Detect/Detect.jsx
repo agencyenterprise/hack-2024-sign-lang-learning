@@ -17,7 +17,11 @@ import ConfigPanel from "../ConfigPanel";
 // import trainedModel from "../../assests/sign_language_recognizer_25-04-2023.task";
 import DisplayImg from "../../assests/displayGif.gif";
 import WordDisplay from "../WordDisplay";
-const baseWords = ["hackathon", "love", "why", "hi"];
+const easyWords = ["hi", "why", "love", ""];
+const mediumWords = ["hackathon", "hello", "world", "python", "javascript"];
+const hardWords = ["paodequeijo", "shenenigans"];
+const darkSouls = ["pneumonoultramicroscopicsilicovolcanoconiosis"];
+
 // const originalWarn = console.warn;
 
 console.warn = function (message) {
@@ -30,31 +34,11 @@ function shuffleArray(array) {
   return array.sort(() => Math.random() - 0.5);
 }
 
-function getNonRepeatingWords(count = 5) {
-  //works well: "love" why hi
-  const conversationalWords = baseWords;
-
-  // Filter words to ensure no repeated letters in sequence
-  const nonRepeatingWords = conversationalWords.filter((word) => {
-    for (let i = 0; i < word.length - 1; i++) {
-      if (word[i] === word[i + 1]) return false; // Skip words with repeated letters
-    }
-    return true;
-  });
-
-  const selectedWords = [];
-  for (let i = 0; i < count; i++) {
-    const randomIndex = Math.floor(Math.random() * nonRepeatingWords.length);
-    selectedWords.push(nonRepeatingWords[randomIndex]);
-  }
-
-  return selectedWords;
-}
-
 const Difficulty = {
   EASY: "easy",
   MEDIUM: "medium",
   HARD: "hard",
+  DARKSOULS: "darkSouls",
 };
 
 const LoadingModal = ({ isOpen }) => {
@@ -125,6 +109,32 @@ const LoadingModal = ({ isOpen }) => {
   );
 };
 
+function checkCorrectGesture({ gestureOutput, currentLetter }) {
+  if (currentLetter.toLowerCase() === "p") {
+    if (
+      gestureOutput.toLowerCase() === "yes" ||
+      gestureOutput.toLowerCase() === "p" ||
+      gestureOutput.toLowerCase() === "u" ||
+      gestureOutput.toLowerCase() === "r"
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+  if (currentLetter.toLowerCase() === "m") {
+    if (
+      gestureOutput.toLowerCase() === "n" ||
+      gestureOutput.toLowerCase() === "m"
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+  return gestureOutput.toLowerCase() === currentLetter.toLowerCase();
+}
+
 const Detect = () => {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
@@ -137,6 +147,7 @@ const Detect = () => {
   const [targetWord, setTargetWord] = useState("");
   const [currentWords, setCurrentWords] = useState([]);
   const [difficulty, setDifficulty] = useState(Difficulty.MEDIUM);
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentLetterIndex, setCurrentLetterIndex] = useState(0);
   const [currentLetter, setCurrentLetter] = useState("");
   const [congratulations, setCongratulations] = useState(false);
@@ -145,15 +156,31 @@ const Detect = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
-  const [elapsedTime, setElapsedTime] = useState(0);
+  const [alwaysShowSigns, setAlwaysShowSigns] = useState(false);
+  const [showHandTracking, setShowHandTracking] = useState(false);
+
+  const getWordsBasedOnDifficulty = () => {
+    if (difficulty === Difficulty.EASY) {
+      return easyWords;
+    } else if (difficulty === Difficulty.MEDIUM) {
+      return mediumWords;
+    } else if (difficulty === Difficulty.HARD) {
+      return hardWords;
+    } else {
+      return darkSouls;
+    }
+  };
 
   useEffect(() => {
-    const shuffledWords = shuffleArray(baseWords);
-    const initialWord = shuffledWords[0];
-    setCurrentWords(shuffleArray(baseWords));
+    const words = getWordsBasedOnDifficulty();
+    const initialWord = words[0];
+    setCurrentWords(words);
     setTargetWord(initialWord);
     setCurrentLetter(initialWord[0]);
-  }, []);
+    setCurrentLetterIndex(0);
+    setCurrentWordIndex(0);
+    setCongratulations(false);
+  }, [difficulty]);
 
   useEffect(() => {
     console.error({ gestureOutput, progress, currentLetter });
@@ -163,16 +190,18 @@ const Detect = () => {
       // gestureOutput !== prevGestureOutput.current &&
       progress >= 70
     ) {
-      if (gestureOutput?.toLowerCase() === currentLetter?.toLowerCase()) {
+      if (
+        checkCorrectGesture({
+          gestureOutput: gestureOutput?.toLowerCase(),
+          currentLetter: currentLetter?.toLowerCase(),
+        })
+      ) {
         if (currentLetterIndex < targetWord.length - 1) {
           setCurrentLetter(targetWord.split("")[currentLetterIndex + 1]);
           setCurrentLetterIndex((prev) => prev + 1);
         } else {
           if (!congratulations) {
             setEndTime(Date.now());
-            setElapsedTime(
-              Math.floor(((endTime || Date.now()) - startTime) / 1000)
-            );
           }
           setCongratulations(true);
         }
@@ -337,13 +366,44 @@ const Detect = () => {
     setShowDynamicOutput(isVisible);
   }
 
+  function changeHandTrackingVisibility(isVisible) {
+    setShowHandTracking(isVisible);
+  }
+
+  useEffect(() => {
+    function handleKeyPress(event) {
+      if (event.shiftKey && event.key === "S") {
+        setAlwaysShowSigns(!alwaysShowSigns);
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [alwaysShowSigns]);
+
   return (
     <>
+      <div
+        style={{
+          position: "absolute",
+          right: 0,
+          top: 0,
+          width: "40px",
+          height: "40px",
+          zIndex: 1001,
+        }}
+        onClick={() => setAlwaysShowSigns(!alwaysShowSigns)}
+      />
+
       <Header />
       <LoadingModal isOpen={isLoading} />
       <ConfigPanel
         onDifficultyChange={changeDifficulty}
         onDetectionVisibilityChange={changeDetectionVisibility}
+        onHandTrackingVisibilityChange={changeHandTrackingVisibility}
         toggleDetection={toggleDetection}
         webcamRunning={webcamRunning}
       />
@@ -352,7 +412,7 @@ const Detect = () => {
         style={{
           color: "white",
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
+          gridTemplateColumns: "2fr 1fr", // Changed from 1fr 1fr to 2fr 1fr
           justifyContent: "center",
           alignItems: "center",
           gap: "20px",
@@ -364,6 +424,7 @@ const Detect = () => {
               targetWord={targetWord}
               currentLetterIndex={currentLetterIndex}
               congratulations={congratulations}
+              alwaysShowSigns={alwaysShowSigns}
               renderBasedOnDifficulty={renderBasedOnDifficulty}
               difficulty={difficulty}
               time={Math.floor(((endTime || Date.now()) - startTime) / 1000)}
@@ -504,7 +565,7 @@ const Detect = () => {
               />
               <canvas
                 style={{
-                  display: showDynamicOutput ? "block" : "none",
+                  display: showHandTracking ? "block" : "none",
                 }}
                 ref={canvasRef}
                 className="signlang_canvas"
@@ -554,6 +615,7 @@ function renderBasedOnDifficulty({
   difficulty,
   currentLetterIndex,
   congratulations,
+  alwaysShowSigns,
 }) {
   if (difficulty === Difficulty.EASY || congratulations) {
     return (
@@ -573,7 +635,10 @@ function renderBasedOnDifficulty({
     );
   }
   // console.error("index", index, "currentLetterIndex", currentLetterIndex);
-  if (difficulty === Difficulty.MEDIUM && index === currentLetterIndex) {
+  if (
+    (difficulty === Difficulty.MEDIUM || alwaysShowSigns) &&
+    index === currentLetterIndex
+  ) {
     return (
       <div
         style={{

@@ -3,11 +3,13 @@ import React, { useState } from "react";
 const ConfigPanel = ({
   onDifficultyChange,
   onDetectionVisibilityChange,
+  onHandTrackingVisibilityChange,
   toggleDetection,
   webcamRunning,
 }) => {
   const [selectedDifficulty, setSelectedDifficulty] = useState("medium");
   const [showDetection, setShowDetection] = useState(false);
+  const [showHandTracking, setShowHandTracking] = useState(false);
 
   const handleDifficultyChange = (difficulty) => {
     setSelectedDifficulty(difficulty);
@@ -19,12 +21,17 @@ const ConfigPanel = ({
     onDetectionVisibilityChange(!showDetection);
   };
 
+  const handleHandTrackingToggle = () => {
+    setShowHandTracking(!showHandTracking);
+    onHandTrackingVisibilityChange(!showHandTracking);
+  };
+
   return (
     <div style={styles.container}>
       <div style={styles.section}>
         <h3 style={styles.sectionTitle}>Difficulty Level</h3>
         <div style={styles.buttonGroup}>
-          {["easy", "medium", "hard"].map((difficulty) => (
+          {["easy", "medium", "hard", "darkSouls"].map((difficulty) => (
             <button
               key={difficulty}
               style={{
@@ -53,6 +60,20 @@ const ConfigPanel = ({
           {showDetection ? "Hide" : "Show"}
         </button>
       </div>
+
+      <div style={styles.section}>
+        <h3 style={styles.sectionTitle}>Hand Tracking</h3>
+        <button
+          style={{
+            ...styles.button,
+            ...(showHandTracking ? styles.activeButton : {}),
+          }}
+          onClick={handleHandTrackingToggle}
+        >
+          {showHandTracking ? "Hide" : "Show"}
+        </button>
+      </div>
+
       {webcamRunning && (
         <div style={styles.section}>
           <h3 style={styles.sectionTitle}>Detection Control</h3>

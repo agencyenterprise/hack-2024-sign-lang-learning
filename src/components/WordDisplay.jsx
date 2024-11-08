@@ -6,6 +6,7 @@ const WordDisplay = ({
   congratulations,
   renderBasedOnDifficulty,
   difficulty,
+  alwaysShowSigns,
   time,
 }) => {
   return (
@@ -37,7 +38,14 @@ const WordDisplay = ({
       </div>
 
       <div>
-        <div style={{ display: "flex", gap: "10px" }}>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "10px",
+            padding: "20px",
+          }}
+        >
           {targetWord.split("").map((letter, index) => (
             <div
               key={index}
@@ -61,6 +69,7 @@ const WordDisplay = ({
                 difficulty,
                 currentLetterIndex,
                 congratulations,
+                alwaysShowSigns,
               })}
             </div>
           ))}
