@@ -440,7 +440,7 @@ const Detect = ({ customWord }) => {
             color: "white",
             display: "grid",
             gridTemplateColumns: "2fr 1fr",
-            gap: "40px",
+            gap: "10px",
             maxWidth: "1600px",
             margin: "0 auto",
           }}
@@ -449,7 +449,7 @@ const Detect = ({ customWord }) => {
             <div
               style={{
                 background: "#2a2a2a",
-                padding: "30px",
+                padding: "15px",
                 borderRadius: "15px",
                 boxShadow: "0 10px 20px rgba(0,0,0,0.2)",
               }}

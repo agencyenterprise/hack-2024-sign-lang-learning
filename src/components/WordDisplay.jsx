@@ -12,57 +12,41 @@ const WordDisplay = ({
   return (
     <div
       style={{
-        fontSize: "20px",
-        fontWeight: "bold",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         width: "100%",
+        color: "#fff",
       }}
     >
       <div
         style={{
-          fontSize: "40px",
-          fontWeight: "bold",
-          marginBottom: "60px",
+          marginBottom: "40px",
+          textAlign: "center",
         }}
       >
         {congratulations ? (
-          <div>
-            <div>You did it! Congratulations!</div>
-            <div>{`Time: ${time}s`}</div>
+          <div style={styles.congratsContainer}>
+            <div style={styles.congratsText}>You did it! Congratulations!</div>
+            <div style={styles.timeText}>Time: {time}s</div>
           </div>
         ) : (
-          "Try to spell this word"
+          <div style={styles.instructionText}>Try to spell this word</div>
         )}
       </div>
 
       <div>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "10px",
-            padding: "20px",
-          }}
-        >
+        <div style={styles.letterContainer}>
           {targetWord.split("").map((letter, index) => (
             <div
               key={index}
               style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "start",
-                alignItems: "center",
-                color:
-                  index < currentLetterIndex || congratulations
-                    ? "gray"
-                    : "white",
+                ...styles.letterWrapper,
+                opacity:
+                  index < currentLetterIndex || congratulations ? 0.5 : 1,
               }}
             >
-              <div style={{ fontSize: "40px", fontWeight: "bold" }}>
-                {letter.toUpperCase()}
-              </div>
+              <div style={styles.letter}>{letter.toUpperCase()}</div>
               {renderBasedOnDifficulty({
                 letter,
                 index: index,
@@ -77,6 +61,57 @@ const WordDisplay = ({
       </div>
     </div>
   );
+};
+
+const styles = {
+  congratsContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "20px",
+  },
+  congratsText: {
+    fontSize: "48px",
+    fontWeight: "800",
+    background: "linear-gradient(45deg, #4CAF50, #2196F3)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    textAlign: "center",
+  },
+  timeText: {
+    fontSize: "32px",
+    fontWeight: "600",
+    color: "#4CAF50",
+  },
+  instructionText: {
+    fontSize: "40px",
+    fontWeight: "800",
+    background: "linear-gradient(45deg, #4CAF50, #2196F3)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+  },
+  letterContainer: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "20px",
+    justifyContent: "center",
+    padding: "20px",
+  },
+  letterWrapper: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "20px",
+    transition: "opacity 0.3s ease",
+  },
+  letter: {
+    fontSize: "48px",
+    fontWeight: "800",
+    background: "linear-gradient(45deg, #FF4081, #FF9100)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    textAlign: "center",
+  },
 };
 
 export default WordDisplay;
