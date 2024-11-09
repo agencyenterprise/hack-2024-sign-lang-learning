@@ -50,6 +50,15 @@ const Header = () => {
         >
           Ask AI
         </Link>
+        <Link
+          to="/presentation"
+          style={{
+            ...styles.link,
+            ...(currentPath === "/presentation" && styles.activeLink),
+          }}
+        >
+          About
+        </Link>
       </nav>
     </div>
   );
