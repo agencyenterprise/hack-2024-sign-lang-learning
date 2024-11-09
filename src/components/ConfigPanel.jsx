@@ -28,7 +28,7 @@ const ConfigPanel = ({
   };
 
   return (
-    <div style={styles.container}>
+    <div style={styles.container} className="config-panel">
       <div style={styles.content}>
         {!isCustomWord && (
           <div style={styles.section}>
@@ -100,14 +100,19 @@ const styles = {
     backgroundColor: "#2a2a2a",
     marginTop: "70px",
     borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+    overflowX: "auto",
   },
   content: {
     maxWidth: "1600px",
     margin: "0 auto",
     display: "flex",
     justifyContent: "start",
-    gap: "40px",
+    gap: "20px",
     flexWrap: "wrap",
+    "@media (max-width: 768px)": {
+      flexDirection: "column",
+      gap: "10px",
+    },
   },
   section: {
     display: "flex",

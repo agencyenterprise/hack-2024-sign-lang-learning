@@ -61,6 +61,10 @@ const styles = {
     padding: "0 40px",
     zIndex: 1000,
     boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
+    "@media (max-width: 768px)": {
+      padding: "0 20px",
+      height: "60px",
+    },
   },
   logo: {
     marginRight: "60px",
@@ -76,6 +80,9 @@ const styles = {
   nav: {
     display: "flex",
     gap: "40px",
+    "@media (max-width: 768px)": {
+      gap: "15px",
+    },
   },
   link: {
     color: "#fff",
@@ -87,6 +94,10 @@ const styles = {
     transition: "all 0.3s ease",
     ":hover": {
       background: "rgba(255, 255, 255, 0.1)",
+    },
+    "@media (max-width: 768px)": {
+      fontSize: "14px",
+      padding: "6px 12px",
     },
   },
   activeLink: {
