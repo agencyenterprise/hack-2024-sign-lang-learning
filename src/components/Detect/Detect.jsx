@@ -502,7 +502,7 @@ const Detect = ({ customWord }) => {
         isCustomWord={!!customWord}
       />
 
-      <div style={{ padding: "20px 40px" }}>
+      <div style={{ padding: "20px 40px" }} className="detect-container">
         <div
           className="detect-grid"
           style={{
@@ -516,6 +516,7 @@ const Detect = ({ customWord }) => {
         >
           {webcamRunning ? (
             <div
+              className="word-display-container"
               style={{
                 background: "#2a2a2a",
                 padding: "15px",
@@ -618,6 +619,7 @@ const Detect = ({ customWord }) => {
           )}
 
           <div
+            className="webcam-section"
             style={{
               background: "#2a2a2a",
               padding: "30px",
@@ -635,6 +637,7 @@ const Detect = ({ customWord }) => {
               >
                 {showDynamicOutput && (
                   <div
+                    className="gesture-output"
                     style={{
                       minHeight: "140px",
                       padding: "20px",
@@ -657,7 +660,10 @@ const Detect = ({ customWord }) => {
                   </div>
                 )}
 
-                <div style={{ position: "relative" }}>
+                <div
+                  style={{ position: "relative" }}
+                  className="webcam-container"
+                >
                   <Webcam
                     audio={false}
                     ref={webcamRef}
@@ -680,6 +686,7 @@ const Detect = ({ customWord }) => {
                       borderRadius: "15px",
                     }}
                     ref={canvasRef}
+                    className="hand-tracking-canvas"
                   />
                 </div>
               </div>

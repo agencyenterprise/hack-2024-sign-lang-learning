@@ -216,6 +216,64 @@ a:focus {
   .mobile-title-adjust {
     font-size: 32px !important;
   }
+
+  .detect-container {
+    padding: 10px !important;
+  }
+
+  .detect-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .word-display-container {
+    padding: 10px !important;
+    max-height: 40vh !important;
+    overflow-y: auto !important;
+  }
+
+  .webcam-section {
+    padding: 10px !important;
+    max-height: 45vh !important;
+  }
+
+  .webcam-container {
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .gesture-output {
+    min-height: auto !important;
+    padding: 10px !important;
+  }
+
+  .gesture-output span {
+    font-size: 40px !important;
+  }
+
+  /* Adjust the sign font size for better visibility */
+  .sign-text {
+    font-size: 80px !important;
+    height: 100px !important;
+  }
+
+  /* Make sure the canvas overlay matches the webcam dimensions */
+  .hand-tracking-canvas {
+    height: 100% !important;
+  }
+}
+
+/* Adjust layout for landscape orientation */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+  .detect-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .word-display-container,
+  .webcam-section {
+    max-height: 80vh !important;
+  }
 }
 
 /* Add orientation warning for mobile */
