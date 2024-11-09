@@ -4,6 +4,7 @@ import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
 import { HAND_CONNECTIONS } from "@mediapipe/hands";
 import Webcam from "react-webcam";
 import Header from "./header";
+import debounce from "lodash/debounce";
 
 const LoadingModal = ({ isOpen }) => {
   if (!isOpen) return null;
@@ -70,6 +71,37 @@ const LoadingModal = ({ isOpen }) => {
   );
 };
 
+const ConfidenceMeter = React.memo(({ progress }) => {
+  const threshold = 70;
+  const isAboveThreshold = progress >= threshold;
+  const clampedProgress = Math.min(Math.max(Math.round(progress), 0), 100);
+
+  return (
+    <div
+      style={{
+        fontSize: "24px",
+        color: "#fff",
+        height: "40px",
+        opacity: clampedProgress > 0 ? 1 : 0,
+        transition: "opacity 0.3s ease",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <span
+        style={{
+          color: isAboveThreshold ? "#4CAF50" : "#ff9800",
+          fontWeight: "600",
+          transition: "color 0.3s ease",
+        }}
+      >
+        {clampedProgress}% {isAboveThreshold ? "✓" : ""}
+      </span>
+    </div>
+  );
+});
+
 const Freestyle = () => {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
@@ -81,17 +113,52 @@ const Freestyle = () => {
   const [progress, setProgress] = useState(0);
   const requestRef = useRef();
   const [isCameraReady, setIsCameraReady] = useState(false);
+  const [lastSpokenGesture, setLastSpokenGesture] = useState("");
+
+  const debouncedSpeak = useCallback(
+    debounce(async (text) => {
+      try {
+        const response = await fetch("http://localhost:3000/api/tts", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            text,
+            voice: "en-US-AriaNeural",
+            rate: 1.5,
+            pitch: 1.0,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("TTS request failed");
+        }
+
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+        audio.playbackRate = 1.2;
+        await audio.play();
+
+        audio.onended = () => {
+          URL.revokeObjectURL(audioUrl);
+        };
+      } catch (error) {
+        console.error("TTS Error:", error);
+      }
+    }, 300),
+    []
+  );
 
   const predictWebcam = useCallback(() => {
     if (!webcamRef.current?.video?.readyState === 4) {
-      // Video not ready yet
       return;
     }
 
     const videoWidth = webcamRef.current.video.videoWidth;
     const videoHeight = webcamRef.current.video.videoHeight;
 
-    // Check if video dimensions are valid
     if (!videoWidth || !videoHeight) {
       console.error("Invalid video dimensions");
       return;
@@ -118,11 +185,9 @@ const Freestyle = () => {
         canvasRef.current.height
       );
 
-      // Set video width
       webcamRef.current.video.width = videoWidth;
       webcamRef.current.video.height = videoHeight;
 
-      // Set canvas height and width
       canvasRef.current.width = videoWidth;
       canvasRef.current.height = videoHeight;
 
@@ -140,20 +205,40 @@ const Freestyle = () => {
       }
 
       if (results.gestures.length > 0) {
-        setGestureOutput(results.gestures[0][0].categoryName);
+        const newGesture = results.gestures[0][0].categoryName;
+        setGestureOutput(newGesture);
         setProgress(Math.round(parseFloat(results.gestures[0][0].score) * 100));
+
+        if (
+          newGesture !== lastSpokenGesture &&
+          results.gestures[0][0].score > 0.7
+        ) {
+          setLastSpokenGesture(newGesture);
+          debouncedSpeak(newGesture);
+        }
       } else {
         setProgress(0);
       }
     } catch (error) {
       console.error("Error in prediction:", error);
-      // Optionally handle the error in UI
     }
 
     if (webcamRunning) {
       requestRef.current = requestAnimationFrame(predictWebcam);
     }
-  }, [webcamRunning, runningMode, gestureRecognizer]);
+  }, [
+    webcamRunning,
+    runningMode,
+    gestureRecognizer,
+    lastSpokenGesture,
+    debouncedSpeak,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      debouncedSpeak.cancel();
+    };
+  }, [debouncedSpeak]);
 
   const animate = useCallback(() => {
     requestRef.current = requestAnimationFrame(animate);
@@ -201,7 +286,6 @@ const Freestyle = () => {
 
   const handleUserMedia = useCallback((stream) => {
     setIsCameraReady(true);
-    // Ensure video track is active and has valid dimensions
     const videoTrack = stream.getVideoTracks()[0];
     if (videoTrack) {
       const settings = videoTrack.getSettings();
@@ -247,9 +331,7 @@ const Freestyle = () => {
     };
   }, [webcamRunning]);
 
-  // Update cleanup effect
   useEffect(() => {
-    // Cleanup function that runs when component unmounts
     return () => {
       if (webcamRunning) {
         setWebcamRunning(false);
@@ -265,7 +347,6 @@ const Freestyle = () => {
           webcamRef.current.video.srcObject = null;
         }
       }
-      // Remove the gesture recognizer cleanup since close() isn't available
       setGestureRecognizer(null);
     };
   }, [webcamRunning]);
@@ -367,7 +448,7 @@ const Freestyle = () => {
                     flexDirection: "column",
                     alignItems: "center",
                     gap: "10px",
-                    minHeight: "140px", // Fixed height for output area
+                    minHeight: "140px",
                     justifyContent: "center",
                   }}
                 >
@@ -386,23 +467,13 @@ const Freestyle = () => {
                   >
                     {gestureOutput}
                   </div>
-                  <div
-                    style={{
-                      fontSize: "24px",
-                      color: "#fff",
-                      height: "30px",
-                      opacity: progress > 0 ? 1 : 0, // Use opacity instead of conditional rendering
-                      transition: "opacity 0.3s ease",
-                    }}
-                  >
-                    {progress}% confident
-                  </div>
+                  <ConfidenceMeter progress={progress} />
                 </div>
                 <div
                   style={{
                     position: "relative",
                     width: "100%",
-                    maxWidth: "600px", // Reduced from 800px
+                    maxWidth: "600px",
                     aspectRatio: "4/3",
                     margin: "20px 0",
                   }}
