@@ -5,6 +5,7 @@ import LandingPage from "./components/LandingPage";
 import CustomWordDetect from "./components/CustomWordDetect";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Freestyle from "./components/Freestyle";
 
 const notifyMsg = (type, msg) => {
   if (type === "success") {
@@ -48,6 +49,15 @@ function App() {
           element={
             <Layout notifyMsg={notifyMsg}>
               <CustomWordDetect />
+            </Layout>
+          }
+        />
+        <Route
+          exact
+          path="/freestyle"
+          element={
+            <Layout>
+              <Freestyle />
             </Layout>
           }
         />

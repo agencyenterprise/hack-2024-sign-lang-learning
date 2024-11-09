@@ -41,6 +41,15 @@ const Header = () => {
         >
           Custom Word
         </Link>
+        <Link
+          to="/freestyle"
+          style={{
+            ...styles.link,
+            ...(currentPath === "/freestyle" && styles.activeLink),
+          }}
+        >
+          Freestyle
+        </Link>
       </nav>
     </div>
   );
