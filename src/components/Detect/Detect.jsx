@@ -195,17 +195,20 @@ const Detect = () => {
   const [customWord, setCustomWord] = useState("");
   const [isCustomMode, setIsCustomMode] = useState(false);
 
-  const getWordsBasedOnDifficulty = () => {
-    if (difficulty === Difficulty.EASY) {
-      return easyWords;
-    } else if (difficulty === Difficulty.MEDIUM) {
-      return mediumWords;
-    } else if (difficulty === Difficulty.HARD) {
-      return hardWords;
-    } else {
-      return darkSouls;
+  const getWordsBasedOnDifficulty = useCallback(() => {
+    switch (difficulty) {
+      case Difficulty.EASY:
+        return easyWords;
+      case Difficulty.MEDIUM:
+        return mediumWords;
+      case Difficulty.HARD:
+        return hardWords;
+      case Difficulty.DARKSOULS:
+        return darkSouls;
+      default:
+        return mediumWords;
     }
-  };
+  }, [difficulty]);
 
   const handleCustomWordChange = (word) => {
     setCustomWord(word);
@@ -403,8 +406,16 @@ const Detect = () => {
     }
   }, [gestureOutput]);
 
-  function changeDifficulty(difficulty) {
-    setDifficulty(difficulty);
+  function changeDifficulty(newDifficulty) {
+    setDifficulty(newDifficulty);
+    const words = getWordsBasedOnDifficulty();
+    const initialWord = words[0];
+    setCurrentWords(words);
+    setTargetWord(initialWord);
+    setCurrentLetter(initialWord[0]);
+    setCurrentLetterIndex(0);
+    setCurrentWordIndex(0);
+    setCongratulations(false);
   }
 
   function changeDetectionVisibility(isVisible) {
@@ -457,6 +468,18 @@ const Detect = () => {
     console.error("Camera error:", error);
     setIsCameraReady(false);
   };
+
+  useEffect(() => {
+    // Initialize words based on difficulty when component mounts
+    const words = getWordsBasedOnDifficulty();
+    const initialWord = words[0];
+    setCurrentWords(words);
+    setTargetWord(initialWord);
+    setCurrentLetter(initialWord[0]);
+    setCurrentLetterIndex(0);
+    setCurrentWordIndex(0);
+    setCongratulations(false);
+  }, [difficulty, getWordsBasedOnDifficulty]);
 
   return (
     <div style={{ backgroundColor: "#1a1a1a", minHeight: "100vh" }}>
@@ -543,125 +566,23 @@ const Detect = () => {
                 Let's Learn <br /> Sign Language!
               </div>
 
-              <div
+              <button
                 style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: "20px",
-                  marginBottom: "30px",
+                  padding: "20px 40px",
+                  backgroundColor: !isCameraReady ? "#666" : "#4CAF50",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "50px",
+                  cursor: isCameraReady ? "pointer" : "not-allowed",
+                  fontSize: "24px",
+                  fontWeight: "600",
+                  opacity: isCameraReady ? 1 : 0.7,
                 }}
+                onClick={() => isCameraReady && toggleDetection()}
+                disabled={!isCameraReady}
               >
-                <button
-                  style={{
-                    padding: "15px 30px",
-                    backgroundColor: !isCustomMode ? "#4CAF50" : "#1a1a1a",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "10px",
-                    cursor: "pointer",
-                    fontSize: "18px",
-                    fontWeight: "600",
-                    transition: "all 0.3s ease",
-                  }}
-                  onClick={() => setIsCustomMode(false)}
-                >
-                  Practice with Preset Words
-                </button>
-                <button
-                  style={{
-                    padding: "15px 30px",
-                    backgroundColor: isCustomMode ? "#4CAF50" : "#1a1a1a",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "10px",
-                    cursor: "pointer",
-                    fontSize: "18px",
-                    fontWeight: "600",
-                    transition: "all 0.3s ease",
-                  }}
-                  onClick={() => setIsCustomMode(true)}
-                >
-                  Practice Custom Word
-                </button>
-              </div>
-
-              {isCustomMode && (
-                <div
-                  style={{
-                    width: "100%",
-                    maxWidth: "400px",
-                    marginBottom: "30px",
-                  }}
-                >
-                  <input
-                    type="text"
-                    value={customWordInput}
-                    onChange={(e) =>
-                      setCustomWordInput(e.target.value.toLowerCase())
-                    }
-                    placeholder="Enter a word to practice..."
-                    pattern="[a-zA-Z]+"
-                    style={{
-                      width: "100%",
-                      padding: "15px",
-                      fontSize: "18px",
-                      backgroundColor: "#1a1a1a",
-                      border: "none",
-                      borderRadius: "10px",
-                      color: "#fff",
-                      marginBottom: "10px",
-                    }}
-                  />
-                </div>
-              )}
-
-              {!webcamRunning && (
-                <button
-                  style={{
-                    padding: "20px 40px",
-                    backgroundColor:
-                      !isCameraReady ||
-                      (isCustomMode && !customWordInput.trim())
-                        ? "#666"
-                        : "#4CAF50",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "50px",
-                    cursor:
-                      isCameraReady && (!isCustomMode || customWordInput.trim())
-                        ? "pointer"
-                        : "not-allowed",
-                    fontSize: "24px",
-                    fontWeight: "600",
-                    opacity:
-                      isCameraReady && (!isCustomMode || customWordInput.trim())
-                        ? 1
-                        : 0.7,
-                  }}
-                  onClick={() => {
-                    if (
-                      isCameraReady &&
-                      (!isCustomMode || customWordInput.trim())
-                    ) {
-                      if (isCustomMode) {
-                        setCurrentWords([customWordInput]);
-                        setTargetWord(customWordInput);
-                        setCurrentLetter(customWordInput[0]);
-                        setCurrentLetterIndex(0);
-                        setCurrentWordIndex(0);
-                        setCongratulations(false);
-                      }
-                      toggleDetection();
-                    }
-                  }}
-                  disabled={
-                    !isCameraReady || (isCustomMode && !customWordInput.trim())
-                  }
-                >
-                  {isCameraReady ? "Start Practice" : "Connecting Camera..."}
-                </button>
-              )}
+                {isCameraReady ? "Start Practice" : "Connecting Camera..."}
+              </button>
             </div>
           )}
 
@@ -770,7 +691,7 @@ function renderBasedOnDifficulty({
       </div>
     );
   }
-  // console.error("index", index, "currentLetterIndex", currentLetterIndex);
+
   if (
     (difficulty === Difficulty.MEDIUM || alwaysShowSigns) &&
     index === currentLetterIndex

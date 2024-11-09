@@ -5,8 +5,8 @@ const ConfigPanel = ({
   onDetectionVisibilityChange,
   onHandTrackingVisibilityChange,
   onCustomWordChange,
-  toggleDetection,
-  webcamRunning,
+  // toggleDetection,
+  // webcamRunning,
 }) => {
   const [selectedDifficulty, setSelectedDifficulty] = useState("medium");
   const [showDetection, setShowDetection] = useState(false);
@@ -16,6 +16,8 @@ const ConfigPanel = ({
   const handleDifficultyChange = (difficulty) => {
     setSelectedDifficulty(difficulty);
     onDifficultyChange(difficulty);
+    setCustomWord("");
+    onCustomWordChange("");
   };
 
   const handleDetectionToggle = () => {
@@ -29,26 +31,19 @@ const ConfigPanel = ({
   };
 
   const handleCustomWordChange = (e) => {
-    const word = e.target.value.toLowerCase();
+    const word = e.target.value.toLowerCase().trim();
     setCustomWord(word);
+
     onCustomWordChange(word);
+
+    if (!word) {
+      onDifficultyChange(selectedDifficulty);
+    }
   };
 
   return (
     <div style={styles.container} className="config-panel">
       <div style={styles.content}>
-        <div style={styles.section}>
-          <h3 style={styles.sectionTitle}>Custom Word</h3>
-          <input
-            type="text"
-            value={customWord}
-            onChange={handleCustomWordChange}
-            placeholder="Enter word to practice..."
-            style={styles.input}
-            pattern="[a-zA-Z]+"
-          />
-        </div>
-
         <div style={styles.section}>
           <h3 style={styles.sectionTitle}>Difficulty Level</h3>
           <div style={styles.buttonGroup}>
@@ -95,8 +90,18 @@ const ConfigPanel = ({
             {showHandTracking ? "Hide" : "Show"}
           </button>
         </div>
-
-        {webcamRunning && (
+        <div style={styles.section}>
+          <h3 style={styles.sectionTitle}>Word to Practice</h3>
+          <input
+            type="text"
+            value={customWord}
+            onChange={handleCustomWordChange}
+            placeholder="Type a custom word or use difficulty..."
+            style={styles.input}
+            pattern="[a-zA-Z]+"
+          />
+        </div>
+        {/* {webcamRunning && (
           <div style={styles.section}>
             <h3 style={styles.sectionTitle}>Detection Control</h3>
             <button
@@ -112,7 +117,7 @@ const ConfigPanel = ({
               Stop Detection
             </button>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
