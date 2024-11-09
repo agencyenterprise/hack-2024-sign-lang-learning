@@ -133,18 +133,24 @@ const Freestyle = () => {
       if (!ttsEnabledRef.current) return;
 
       try {
-        const response = await fetch("http://localhost:3000/api/tts", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            text,
-            voice: "en-US-AriaNeural",
-            rate: 1.5,
-            pitch: 1.0,
-          }),
-        });
+        const response = await fetch(
+          "https://hack-2024-sign-language-backend-production.up.railway.app/api/tts",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "*",
+              "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+              "Access-Control-Allow-Headers": "Content-Type",
+            },
+            body: JSON.stringify({
+              text,
+              voice: "en-US-AriaNeural",
+              rate: 1.5,
+              pitch: 1.0,
+            }),
+          }
+        );
 
         if (!response.ok) {
           throw new Error("TTS request failed");

@@ -51,16 +51,22 @@ If a question is not related to sign language, kindly remind the user that you'r
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3000/api/completion", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          messages: [...messages, userMessage],
-          generateImage: generateImages,
-        }),
-      });
+      const response = await fetch(
+        "https://hack-2024-sign-language-backend-production.up.railway.app/api/completion",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+          },
+          body: JSON.stringify({
+            messages: [...messages, userMessage],
+            generateImage: generateImages,
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to get response");

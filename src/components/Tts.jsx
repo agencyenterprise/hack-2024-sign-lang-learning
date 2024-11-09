@@ -9,13 +9,16 @@ const TextToSpeech = () => {
     try {
       setIsLoading(true);
 
-      const response = await fetch("http://localhost:3000/api/tts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ text }),
-      });
+      const response = await fetch(
+        "https://hack-2024-sign-language-backend-production.up.railway.app/api/tts",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ text }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("TTS request failed");

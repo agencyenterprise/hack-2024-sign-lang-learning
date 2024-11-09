@@ -33,15 +33,6 @@ const Header = () => {
           Practice
         </Link>
         <Link
-          to="/custom"
-          style={{
-            ...styles.link,
-            ...(currentPath === "/custom" && styles.activeLink),
-          }}
-        >
-          Custom Word
-        </Link>
-        <Link
           to="/freestyle"
           style={{
             ...styles.link,

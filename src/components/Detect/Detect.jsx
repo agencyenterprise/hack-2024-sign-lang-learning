@@ -168,7 +168,7 @@ function checkCorrectGesture({ gestureOutput, currentLetter }) {
   return gestureOutput.toLowerCase() === currentLetter.toLowerCase();
 }
 
-const Detect = ({ customWord }) => {
+const Detect = () => {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
   const [showDynamicOutput, setShowDynamicOutput] = useState(false);
@@ -192,6 +192,8 @@ const Detect = ({ customWord }) => {
   const [alwaysShowSigns, setAlwaysShowSigns] = useState(false);
   const [showHandTracking, setShowHandTracking] = useState(false);
   const [isCameraReady, setIsCameraReady] = useState(false);
+  const [customWord, setCustomWord] = useState("");
+  const [isCustomMode, setIsCustomMode] = useState(false);
 
   const getWordsBasedOnDifficulty = () => {
     if (difficulty === Difficulty.EASY) {
@@ -205,11 +207,12 @@ const Detect = ({ customWord }) => {
     }
   };
 
-  useEffect(() => {
-    if (customWord) {
-      setCurrentWords([customWord]);
-      setTargetWord(customWord);
-      setCurrentLetter(customWord[0]);
+  const handleCustomWordChange = (word) => {
+    setCustomWord(word);
+    if (word) {
+      setCurrentWords([word]);
+      setTargetWord(word);
+      setCurrentLetter(word[0]);
       setCurrentLetterIndex(0);
       setCurrentWordIndex(0);
       setCongratulations(false);
@@ -223,7 +226,7 @@ const Detect = ({ customWord }) => {
       setCurrentWordIndex(0);
       setCongratulations(false);
     }
-  }, [difficulty, customWord]);
+  };
 
   useEffect(() => {
     console.error({ gestureOutput, progress, currentLetter });
@@ -475,9 +478,9 @@ const Detect = ({ customWord }) => {
         onDifficultyChange={changeDifficulty}
         onDetectionVisibilityChange={changeDetectionVisibility}
         onHandTrackingVisibilityChange={changeHandTrackingVisibility}
+        onCustomWordChange={handleCustomWordChange}
         toggleDetection={toggleDetection}
         webcamRunning={webcamRunning}
-        isCustomWord={!!customWord}
       />
 
       <div style={{ padding: "20px 40px" }} className="detect-container">
@@ -539,59 +542,125 @@ const Detect = ({ customWord }) => {
               >
                 Let's Learn <br /> Sign Language!
               </div>
-              {!webcamRunning && (
-                <>
-                  <button
+
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "20px",
+                  marginBottom: "30px",
+                }}
+              >
+                <button
+                  style={{
+                    padding: "15px 30px",
+                    backgroundColor: !isCustomMode ? "#4CAF50" : "#1a1a1a",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "10px",
+                    cursor: "pointer",
+                    fontSize: "18px",
+                    fontWeight: "600",
+                    transition: "all 0.3s ease",
+                  }}
+                  onClick={() => setIsCustomMode(false)}
+                >
+                  Practice with Preset Words
+                </button>
+                <button
+                  style={{
+                    padding: "15px 30px",
+                    backgroundColor: isCustomMode ? "#4CAF50" : "#1a1a1a",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "10px",
+                    cursor: "pointer",
+                    fontSize: "18px",
+                    fontWeight: "600",
+                    transition: "all 0.3s ease",
+                  }}
+                  onClick={() => setIsCustomMode(true)}
+                >
+                  Practice Custom Word
+                </button>
+              </div>
+
+              {isCustomMode && (
+                <div
+                  style={{
+                    width: "100%",
+                    maxWidth: "400px",
+                    marginBottom: "30px",
+                  }}
+                >
+                  <input
+                    type="text"
+                    value={customWordInput}
+                    onChange={(e) =>
+                      setCustomWordInput(e.target.value.toLowerCase())
+                    }
+                    placeholder="Enter a word to practice..."
+                    pattern="[a-zA-Z]+"
                     style={{
-                      padding: "20px 40px",
-                      width: "auto",
-                      backgroundColor: !isCameraReady ? "#666" : "#4CAF50",
-                      color: "white",
+                      width: "100%",
+                      padding: "15px",
+                      fontSize: "18px",
+                      backgroundColor: "#1a1a1a",
                       border: "none",
-                      borderRadius: "50px",
-                      cursor: isCameraReady ? "pointer" : "not-allowed",
-                      fontSize: "44px",
-                      fontWeight: "800",
-                      textTransform: "uppercase",
-                      boxShadow: isCameraReady
-                        ? "0 10px 20px rgba(0,0,0,0.2)"
-                        : "none",
-                      transition: "all 0.3s ease",
-                      transform: "scale(1)",
-                      opacity: isCameraReady ? 1 : 0.7,
+                      borderRadius: "10px",
+                      color: "#fff",
+                      marginBottom: "10px",
                     }}
-                    onMouseEnter={(e) => {
-                      if (isCameraReady) {
-                        e.target.style.transform = "scale(1.05)";
-                        e.target.style.boxShadow =
-                          "0 15px 25px rgba(0,0,0,0.3)";
+                  />
+                </div>
+              )}
+
+              {!webcamRunning && (
+                <button
+                  style={{
+                    padding: "20px 40px",
+                    backgroundColor:
+                      !isCameraReady ||
+                      (isCustomMode && !customWordInput.trim())
+                        ? "#666"
+                        : "#4CAF50",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "50px",
+                    cursor:
+                      isCameraReady && (!isCustomMode || customWordInput.trim())
+                        ? "pointer"
+                        : "not-allowed",
+                    fontSize: "24px",
+                    fontWeight: "600",
+                    opacity:
+                      isCameraReady && (!isCustomMode || customWordInput.trim())
+                        ? 1
+                        : 0.7,
+                  }}
+                  onClick={() => {
+                    if (
+                      isCameraReady &&
+                      (!isCustomMode || customWordInput.trim())
+                    ) {
+                      if (isCustomMode) {
+                        setCurrentWords([customWordInput]);
+                        setTargetWord(customWordInput);
+                        setCurrentLetter(customWordInput[0]);
+                        setCurrentLetterIndex(0);
+                        setCurrentWordIndex(0);
+                        setCongratulations(false);
                       }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (isCameraReady) {
-                        e.target.style.transform = "scale(1)";
-                        e.target.style.boxShadow =
-                          "0 10px 20px rgba(0,0,0,0.2)";
-                      }
-                    }}
-                    onClick={() => isCameraReady && toggleDetection()}
-                    disabled={!isCameraReady}
-                  >
-                    {isCameraReady ? "Start" : "Connecting..."}
-                  </button>
-                  {!isCameraReady && (
-                    <div
-                      style={{
-                        marginTop: "20px",
-                        color: "#999",
-                        fontSize: "16px",
-                        textAlign: "center",
-                      }}
-                    >
-                      Please allow camera access to continue
-                    </div>
-                  )}
-                </>
+                      toggleDetection();
+                    }
+                  }}
+                  disabled={
+                    !isCameraReady || (isCustomMode && !customWordInput.trim())
+                  }
+                >
+                  {isCameraReady ? "Start Practice" : "Connecting Camera..."}
+                </button>
               )}
             </div>
           )}
