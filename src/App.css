@@ -228,13 +228,13 @@ a:focus {
 
   .word-display-container {
     padding: 10px !important;
-    max-height: 40vh !important;
-    overflow-y: auto !important;
+    max-height: none !important;
+    overflow-y: visible !important;
   }
 
   .webcam-section {
     padding: 10px !important;
-    max-height: 45vh !important;
+    max-height: none !important;
   }
 
   .webcam-container {
@@ -273,28 +273,5 @@ a:focus {
   .word-display-container,
   .webcam-section {
     max-height: 80vh !important;
-  }
-}
-
-/* Add orientation warning for mobile */
-.orientation-warning {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.9);
-  z-index: 9999;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  color: white;
-  padding: 20px;
-}
-
-@media screen and (max-width: 768px) and (orientation: portrait) {
-  .orientation-warning {
-    display: flex;
   }
 }

@@ -172,25 +172,6 @@ function checkCorrectGesture({ gestureOutput, currentLetter }) {
   return gestureOutput.toLowerCase() === currentLetter.toLowerCase();
 }
 
-const OrientationWarning = () => (
-  <div className="orientation-warning">
-    <div>
-      <h2
-        style={{
-          fontSize: "24px",
-          marginBottom: "20px",
-          background: "linear-gradient(45deg, #4CAF50, #2196F3)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-        }}
-      >
-        Please rotate your device
-      </h2>
-      <p>This application works best in landscape orientation</p>
-    </div>
-  </div>
-);
-
 const Detect = ({ customWord }) => {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
@@ -478,7 +459,6 @@ const Detect = ({ customWord }) => {
 
   return (
     <div style={{ backgroundColor: "#1a1a1a", minHeight: "100vh" }}>
-      <OrientationWarning />
       <div
         style={{
           position: "absolute",
