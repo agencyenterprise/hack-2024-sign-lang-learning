@@ -288,6 +288,10 @@ const Freestyle = () => {
             padding: "30px",
             borderRadius: "15px",
             boxShadow: "0 10px 20px rgba(0,0,0,0.2)",
+            minHeight: "600px",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
           }}
         >
           <div style={{ height: 0, overflow: "hidden", position: "absolute" }}>
@@ -301,129 +305,135 @@ const Freestyle = () => {
                 height: 480,
                 facingMode: "user",
               }}
-              style={{
-                width: "100%",
-                borderRadius: "15px",
-              }}
             />
           </div>
 
-          {!webcamRunning ? (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "20px",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "48px",
-                  fontWeight: "800",
-                  background: "linear-gradient(45deg, #4CAF50, #2196F3)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  textAlign: "center",
-                }}
-              >
-                Practice Sign Language Freely
-              </div>
-              <button
-                style={{
-                  padding: "20px 40px",
-                  backgroundColor: !isCameraReady ? "#666" : "#4CAF50",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "50px",
-                  cursor: isCameraReady ? "pointer" : "not-allowed",
-                  fontSize: "24px",
-                  fontWeight: "600",
-                  opacity: isCameraReady ? 1 : 0.7,
-                }}
-                onClick={() => isCameraReady && toggleDetection()}
-                disabled={!isCameraReady}
-              >
-                {isCameraReady ? "Start Practice" : "Connecting Camera..."}
-              </button>
-            </div>
-          ) : (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "20px",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "80px",
-                  fontWeight: "800",
-                  background: "linear-gradient(45deg, #4CAF50, #2196F3)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  textAlign: "center",
-                }}
-              >
-                {gestureOutput}
-              </div>
-              {progress > 0 && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "20px",
+              width: "100%",
+            }}
+          >
+            {!webcamRunning ? (
+              <>
                 <div
                   style={{
-                    fontSize: "24px",
-                    color: "#fff",
+                    fontSize: "48px",
+                    fontWeight: "800",
+                    background: "linear-gradient(45deg, #4CAF50, #2196F3)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    textAlign: "center",
+                    marginBottom: "20px",
+                    height: "60px",
                   }}
                 >
-                  {progress}% confident
+                  Practice Sign Language Freely
                 </div>
-              )}
-              <div
-                style={{
-                  position: "relative",
-                  maxWidth: "800px",
-                  width: "100%",
-                }}
-              >
-                <Webcam
-                  audio={false}
-                  ref={webcamRef}
-                  onUserMedia={handleUserMedia}
-                  onUserMediaError={handleCameraError}
+                <div
                   style={{
-                    width: "100%",
-                    borderRadius: "15px",
+                    height: "400px",
+                    display: "flex",
+                    alignItems: "center",
                   }}
-                />
-                <canvas
-                  ref={canvasRef}
+                >
+                  <button
+                    style={{
+                      padding: "20px 40px",
+                      backgroundColor: !isCameraReady ? "#666" : "#4CAF50",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "50px",
+                      cursor: isCameraReady ? "pointer" : "not-allowed",
+                      fontSize: "24px",
+                      fontWeight: "600",
+                      opacity: isCameraReady ? 1 : 0.7,
+                    }}
+                    onClick={() => isCameraReady && toggleDetection()}
+                    disabled={!isCameraReady}
+                  >
+                    {isCameraReady ? "Start Practice" : "Connecting Camera..."}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div
                   style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    borderRadius: "15px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: "10px",
+                    minHeight: "140px", // Fixed height for output area
+                    justifyContent: "center",
                   }}
-                />
-              </div>
-              <button
-                style={{
-                  padding: "15px 30px",
-                  backgroundColor: "#f44336",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "30px",
-                  cursor: "pointer",
-                  fontSize: "20px",
-                  fontWeight: "600",
-                }}
-                onClick={toggleDetection}
-              >
-                Stop Practice
-              </button>
-            </div>
-          )}
+                >
+                  <div
+                    style={{
+                      fontSize: "80px",
+                      fontWeight: "800",
+                      background: "linear-gradient(45deg, #4CAF50, #2196F3)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      textAlign: "center",
+                      height: "100px",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    {gestureOutput}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "24px",
+                      color: "#fff",
+                      height: "30px",
+                      opacity: progress > 0 ? 1 : 0, // Use opacity instead of conditional rendering
+                      transition: "opacity 0.3s ease",
+                    }}
+                  >
+                    {progress}% confident
+                  </div>
+                </div>
+                <div
+                  style={{
+                    position: "relative",
+                    width: "100%",
+                    maxWidth: "600px", // Reduced from 800px
+                    aspectRatio: "4/3",
+                    margin: "20px 0",
+                  }}
+                >
+                  <Webcam
+                    audio={false}
+                    ref={webcamRef}
+                    onUserMedia={handleUserMedia}
+                    onUserMediaError={handleCameraError}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      borderRadius: "15px",
+                      objectFit: "cover",
+                    }}
+                  />
+                  <canvas
+                    ref={canvasRef}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      borderRadius: "15px",
+                    }}
+                  />
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>
