@@ -6,6 +6,7 @@ import CustomWordDetect from "./components/CustomWordDetect";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Freestyle from "./components/Freestyle";
+import TextToSpeech from "./components/Tts";
 
 const notifyMsg = (type, msg) => {
   if (type === "success") {
@@ -31,6 +32,15 @@ function App() {
           element={
             <Layout>
               <LandingPage />
+            </Layout>
+          }
+        />
+        <Route
+          exact
+          path="/tts"
+          element={
+            <Layout>
+              <TextToSpeech />
             </Layout>
           }
         />
