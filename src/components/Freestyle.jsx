@@ -5,6 +5,7 @@ import { HAND_CONNECTIONS } from "@mediapipe/hands";
 import Webcam from "react-webcam";
 import Header from "./header";
 import debounce from "lodash/debounce";
+import "./Freestyle.css";
 
 const LoadingModal = ({ isOpen }) => {
   if (!isOpen) return null;
@@ -114,9 +115,23 @@ const Freestyle = () => {
   const requestRef = useRef();
   const [isCameraReady, setIsCameraReady] = useState(false);
   const [lastSpokenGesture, setLastSpokenGesture] = useState("");
+  const [showHandTracking, setShowHandTracking] = useState(true);
+  const [ttsEnabled, setTtsEnabled] = useState(true);
+  const ttsEnabledRef = useRef(true);
+  const debouncedSpeakRef = useRef(null);
 
-  const debouncedSpeak = useCallback(
-    debounce(async (text) => {
+  useEffect(() => {
+    ttsEnabledRef.current = ttsEnabled;
+  }, [ttsEnabled]);
+
+  const debouncedSpeak = useCallback((text) => {
+    if (debouncedSpeakRef.current) {
+      debouncedSpeakRef.current.cancel();
+    }
+
+    debouncedSpeakRef.current = debounce(async () => {
+      if (!ttsEnabledRef.current) return;
+
       try {
         const response = await fetch("http://localhost:3000/api/tts", {
           method: "POST",
@@ -147,9 +162,10 @@ const Freestyle = () => {
       } catch (error) {
         console.error("TTS Error:", error);
       }
-    }, 300),
-    []
-  );
+    }, 300);
+
+    debouncedSpeakRef.current();
+  }, []);
 
   const predictWebcam = useCallback(() => {
     if (!webcamRef.current?.video?.readyState === 4) {
@@ -211,7 +227,8 @@ const Freestyle = () => {
 
         if (
           newGesture !== lastSpokenGesture &&
-          results.gestures[0][0].score > 0.7
+          results.gestures[0][0].score > 0.7 &&
+          ttsEnabled
         ) {
           setLastSpokenGesture(newGesture);
           debouncedSpeak(newGesture);
@@ -236,9 +253,11 @@ const Freestyle = () => {
 
   useEffect(() => {
     return () => {
-      debouncedSpeak.cancel();
+      if (debouncedSpeakRef.current) {
+        debouncedSpeakRef.current.cancel();
+      }
     };
-  }, [debouncedSpeak]);
+  }, []);
 
   const animate = useCallback(() => {
     requestRef.current = requestAnimationFrame(animate);
@@ -285,14 +304,10 @@ const Freestyle = () => {
   }, [runningMode]);
 
   const handleUserMedia = useCallback((stream) => {
-    setIsCameraReady(true);
-    const videoTrack = stream.getVideoTracks()[0];
-    if (videoTrack) {
-      const settings = videoTrack.getSettings();
-      if (!settings.width || !settings.height) {
-        console.error("Invalid video track settings");
-        setIsCameraReady(false);
-      }
+    if (webcamRef.current && webcamRef.current.video) {
+      webcamRef.current.video.onloadedmetadata = () => {
+        setIsCameraReady(true);
+      };
     }
   }, []);
 
@@ -302,22 +317,29 @@ const Freestyle = () => {
   };
 
   useEffect(() => {
-    if (!webcamRunning && webcamRef.current) {
-      const initializeCamera = async () => {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({
-            video: true,
-          });
-          if (webcamRef.current) {
-            webcamRef.current.video.srcObject = stream;
-          }
-        } catch (error) {
-          console.error("Error initializing camera:", error);
-          setIsCameraReady(false);
+    const initializeCamera = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            width: 640,
+            height: 480,
+            facingMode: "user",
+          },
+        });
+
+        if (webcamRef.current && webcamRef.current.video) {
+          webcamRef.current.video.srcObject = stream;
+          webcamRef.current.video.onloadedmetadata = () => {
+            setIsCameraReady(true);
+          };
         }
-      };
-      initializeCamera();
-    }
+      } catch (error) {
+        console.error("Error initializing camera:", error);
+        setIsCameraReady(false);
+      }
+    };
+
+    initializeCamera();
 
     return () => {
       if (webcamRef.current && webcamRef.current.video) {
@@ -329,7 +351,7 @@ const Freestyle = () => {
         webcamRef.current.video.srcObject = null;
       }
     };
-  }, [webcamRunning]);
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -356,7 +378,21 @@ const Freestyle = () => {
       <Header />
       <LoadingModal isOpen={isLoading} />
 
+      <Webcam
+        audio={false}
+        ref={webcamRef}
+        onUserMedia={handleUserMedia}
+        onUserMediaError={handleCameraError}
+        style={{ display: "none" }}
+        videoConstraints={{
+          width: 640,
+          height: 480,
+          facingMode: "user",
+        }}
+      />
+
       <div
+        className="freestyle-container"
         style={{
           padding: "90px 20px 20px 20px",
           maxWidth: "1200px",
@@ -375,18 +411,59 @@ const Freestyle = () => {
             justifyContent: "center",
           }}
         >
-          <div style={{ height: 0, overflow: "hidden", position: "absolute" }}>
-            <Webcam
-              audio={false}
-              ref={webcamRef}
-              onUserMedia={handleUserMedia}
-              onUserMediaError={handleCameraError}
-              videoConstraints={{
-                width: 640,
-                height: 480,
-                facingMode: "user",
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "10px",
+              marginBottom: "20px",
+            }}
+          >
+            <button
+              onClick={() => setShowHandTracking(!showHandTracking)}
+              style={{
+                padding: "8px 16px",
+                borderRadius: "8px",
+                border: "none",
+                backgroundColor: showHandTracking ? "#4CAF50" : "#1a1a1a",
+                color: "#fff",
+                cursor: "pointer",
+                fontSize: "14px",
+                fontWeight: "500",
+                transition: "all 0.3s ease",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
               }}
-            />
+            >
+              <span style={{ fontSize: "18px", lineHeight: 1 }}>
+                {showHandTracking ? "👋" : "✋"}
+              </span>
+              {showHandTracking ? "Hide Tracking" : "Show Tracking"}
+            </button>
+
+            <button
+              onClick={() => setTtsEnabled(!ttsEnabled)}
+              style={{
+                padding: "8px 16px",
+                borderRadius: "8px",
+                border: "none",
+                backgroundColor: ttsEnabled ? "#4CAF50" : "#1a1a1a",
+                color: "#fff",
+                cursor: "pointer",
+                fontSize: "14px",
+                fontWeight: "500",
+                transition: "all 0.3s ease",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <span style={{ fontSize: "18px", lineHeight: 1 }}>
+                {ttsEnabled ? "🔊" : "🔇"}
+              </span>
+              {ttsEnabled ? "Sound On" : "Sound Off"}
+            </button>
           </div>
 
           <div
@@ -399,7 +476,16 @@ const Freestyle = () => {
             }}
           >
             {!webcamRunning ? (
-              <>
+              <div
+                style={{
+                  height: "400px",
+                  display: "flex",
+                  alignItems: "center",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  gap: "20px",
+                }}
+              >
                 <div
                   style={{
                     fontSize: "48px",
@@ -408,38 +494,28 @@ const Freestyle = () => {
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     textAlign: "center",
-                    marginBottom: "20px",
-                    height: "60px",
                   }}
                 >
                   Practice Sign Language Freely
                 </div>
-                <div
+                <button
                   style={{
-                    height: "400px",
-                    display: "flex",
-                    alignItems: "center",
+                    padding: "20px 40px",
+                    backgroundColor: !isCameraReady ? "#666" : "#4CAF50",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "50px",
+                    cursor: isCameraReady ? "pointer" : "not-allowed",
+                    fontSize: "24px",
+                    fontWeight: "600",
+                    opacity: isCameraReady ? 1 : 0.7,
                   }}
+                  onClick={() => isCameraReady && toggleDetection()}
+                  disabled={!isCameraReady}
                 >
-                  <button
-                    style={{
-                      padding: "20px 40px",
-                      backgroundColor: !isCameraReady ? "#666" : "#4CAF50",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "50px",
-                      cursor: isCameraReady ? "pointer" : "not-allowed",
-                      fontSize: "24px",
-                      fontWeight: "600",
-                      opacity: isCameraReady ? 1 : 0.7,
-                    }}
-                    onClick={() => isCameraReady && toggleDetection()}
-                    disabled={!isCameraReady}
-                  >
-                    {isCameraReady ? "Start Practice" : "Connecting Camera..."}
-                  </button>
-                </div>
-              </>
+                  {isCameraReady ? "Start Practice" : "Connecting Camera..."}
+                </button>
+              </div>
             ) : (
               <>
                 <div
@@ -493,6 +569,7 @@ const Freestyle = () => {
                   <canvas
                     ref={canvasRef}
                     style={{
+                      display: showHandTracking ? "block" : "none",
                       position: "absolute",
                       top: 0,
                       left: 0,

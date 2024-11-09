@@ -50,6 +50,15 @@ const Header = () => {
         >
           Freestyle
         </Link>
+        <Link
+          to="/chat"
+          style={{
+            ...styles.link,
+            ...(currentPath === "/chat" && styles.activeLink),
+          }}
+        >
+          Ask AI
+        </Link>
       </nav>
     </div>
   );

@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Freestyle from "./components/Freestyle";
 import TextToSpeech from "./components/Tts";
+import SignLanguageChat from "./components/SignLanguageChat";
 
 const notifyMsg = (type, msg) => {
   if (type === "success") {
@@ -68,6 +69,15 @@ function App() {
           element={
             <Layout>
               <Freestyle />
+            </Layout>
+          }
+        />
+        <Route
+          exact
+          path="/chat"
+          element={
+            <Layout>
+              <SignLanguageChat />
             </Layout>
           }
         />

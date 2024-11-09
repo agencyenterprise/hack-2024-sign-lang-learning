@@ -231,7 +231,9 @@ const Detect = ({ customWord }) => {
     if (
       gestureOutput &&
       // gestureOutput !== prevGestureOutput.current &&
-      (progress >= 70 || gestureOutput.toLowerCase() === "g")
+      (progress >= 70 ||
+        gestureOutput.toLowerCase() === "g" ||
+        gestureOutput.toLowerCase() === "r")
     ) {
       if (
         checkCorrectGesture({
