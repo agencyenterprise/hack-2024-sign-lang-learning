@@ -1,4 +1,5 @@
 import { AuthProvider } from "@/components/providers/auth-provider";
+import { PostHogProvider } from "@/components/providers/posthog-provider";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -24,7 +25,9 @@ export default function RootLayout({
           inter.className
         )}
       >
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <PostHogProvider>{children}</PostHogProvider>
+        </AuthProvider>
       </body>
     </html>
   );
