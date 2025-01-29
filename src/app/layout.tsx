@@ -1,3 +1,4 @@
+import { AuthProvider } from "@/components/providers/auth-provider";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -23,7 +24,7 @@ export default function RootLayout({
           inter.className
         )}
       >
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
