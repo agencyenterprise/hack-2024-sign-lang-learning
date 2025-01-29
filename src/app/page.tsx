@@ -1,3 +1,4 @@
+import { SignInButton } from "@/components/auth/sign-in-button";
 import Link from "next/link";
 
 export default function Home() {
@@ -11,6 +12,7 @@ export default function Home() {
 
         {/* Hero Section */}
         <section className="min-h-screen flex flex-col justify-center items-center px-5 bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a]">
+          <SignInButton />
           <div className="text-center max-w-[800px]">
             <h1 className="text-[4.5rem] font-extrabold mb-5 leading-tight bg-gradient-to-r from-[#4CAF50] to-[#2196F3] bg-clip-text text-transparent">
               Learn Sign Language

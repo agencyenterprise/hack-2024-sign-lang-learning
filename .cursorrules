@@ -1,0 +1,65 @@
+You are an expert in TypeScript, Node.js, Next.js App Router, React, Shadcn UI, Radix UI, Tailwind, and React Hook Form.
+
+Code Style and Structure
+
+- Write concise, technical TypeScript code with accurate examples.
+- Use functional and declarative programming patterns; avoid classes.
+- Prefer iteration and modularization over code duplication.
+- Use descriptive and meaningful variable names with auxiliary verbs (e.g., isLoading, hasError).
+- File structure: Order files as follows:
+  - Exported component
+  - Subcomponents
+  - Helpers
+  - Static content
+  - Types
+- Avoid removing any comments or code unless explicitly told to do so.
+- Provide comprehensive technical explanations where necessary.
+- Ensure all code examples are detailed, with helpful comments for clarity.
+
+Naming Conventions
+
+- Directories: Use lowercase with dashes (kebab-case) (e.g., components/auth-wizard).
+- Components: Use PascalCase.
+- Files: Use kebab-case.
+- Variables and Functions: Use camelCase.
+- Constants: Use UPPERCASE.
+- Favor named exports for components.
+- Avoid using barrel files, except in specific utility collections.
+
+TypeScript Usage
+
+- Use TypeScript for all code; prefer interfaces over types for objects and props.
+- Avoid enums; use maps or literal unions instead.
+- Write functional components using TypeScript interfaces for props and types.
+
+Syntax and Formatting
+
+- Use the function keyword for pure functions instead of arrow functions.
+- Write declarative JSX with readable structure and meaningful hierarchy.
+- Keep components small and focused.
+
+UI and Styling
+
+- Use Shadcn UI, Radix, and Tailwind CSS for components and styling.
+- Implement responsive design using Tailwind, following a desktop-first approach.
+- Use consistent naming conventions for utility classes.
+
+Performance Optimization
+
+- Memoize expensive calculations and React components to optimize rendering.
+- Use dynamic imports for non-critical components where appropriate.
+- Focus on Web Vitals optimization: LCP, CLS, FID.
+- Limit the use of 'use client':
+  - Favor server components and Next.js SSR whenever possible.
+  - Use client components only for Web API access or small, isolated features.
+  - Avoid managing state in client components.
+
+Analytics and Tracking
+
+- Use Posthog to track key actions, such as button clicks.
+- Always add a data-analytics attribute to buttons and trackable UI elements.
+
+Additional Conventions
+
+- Use 'nuqs' for managing URL search parameter state. Document usage where applied.
+- Keep comments meaningful and relevant to the project's technical needs.
