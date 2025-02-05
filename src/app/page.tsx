@@ -3,17 +3,14 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <div className="min-h-screen bg-[#1a1a1a] text-white">
-        {/* Add multiple flying logos
-        {[...Array(1)].map((_, i) => (
-          <FlyingLogo key={i} />
-        ))} */}
-
+    <main className="flex min-h-screen flex-col bg-neutral-900 items-center justify-center px-24">
+      <header className="flex justify-end w-full max-w-7xl py-4">
+        <SignInButton />
+      </header>
+      <div className="min-h-screen text-white w-full max-w-7xl">
         {/* Hero Section */}
-        <section className="min-h-screen flex flex-col justify-center items-center px-5 bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a]">
-          <SignInButton />
-          <div className="text-center max-w-[800px]">
+        <section className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-neutral-900 to-neutral-800">
+          <div className="text-center">
             <h1 className="text-[4.5rem] font-extrabold mb-5 leading-tight bg-gradient-to-r from-[#4CAF50] to-[#2196F3] bg-clip-text text-transparent">
               Learn Sign Language
               <span className="block text-[5rem] bg-gradient-to-r from-[#FF4081] to-[#FF9100] bg-clip-text text-transparent">
@@ -69,12 +66,12 @@ export default function Home() {
         </section>
 
         {/* Features Section */}
-        <section className="py-[100px] px-5 bg-[#2a2a2a]">
+        <section className="py-[100px] bg-neutral-to-neutral-800">
           <h2 className="text-[2.5rem] text-center mb-[60px] bg-gradient-to-r from-[#4CAF50] to-[#2196F3] bg-clip-text text-transparent">
             Why Choose Our Platform?
           </h2>
           <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-[30px] max-w-[1200px] mx-auto px-5">
-            <div className="bg-[#1a1a1a] p-[30px] rounded-[15px] text-center transition-transform duration-300 cursor-pointer hover:-translate-y-[10px]">
+            <div className="bg-neutral-900 p-[30px] rounded-[15px] text-center transition-transform duration-300 cursor-pointer hover:-translate-y-[10px]">
               <div className="text-[3rem] mb-5">🎯</div>
               <h3 className="text-2xl mb-4 text-white">Real-time Feedback</h3>
               <p className="text-[#cccccc] leading-relaxed">
@@ -82,14 +79,14 @@ export default function Home() {
                 technology
               </p>
             </div>
-            <div className="bg-[#1a1a1a] p-[30px] rounded-[15px] text-center transition-transform duration-300 cursor-pointer hover:-translate-y-[10px]">
+            <div className="bg-neutral-900 p-[30px] rounded-[15px] text-center transition-transform duration-300 cursor-pointer hover:-translate-y-[10px]">
               <div className="text-[3rem] mb-5">🎮</div>
               <h3 className="text-2xl mb-4 text-white">Gamified Learning</h3>
               <p className="text-[#cccccc] leading-relaxed">
                 Learn through fun, interactive exercises and track your progress
               </p>
             </div>
-            <div className="bg-[#1a1a1a] p-[30px] rounded-[15px] text-center transition-transform duration-300 cursor-pointer hover:-translate-y-[10px]">
+            <div className="bg-neutral-900 p-[30px] rounded-[15px] text-center transition-transform duration-300 cursor-pointer hover:-translate-y-[10px]">
               <div className="text-[3rem] mb-5">📈</div>
               <h3 className="text-2xl mb-4 text-white">
                 Progressive Difficulty
@@ -98,7 +95,7 @@ export default function Home() {
                 Start with basics and gradually advance to more complex signs
               </p>
             </div>
-            <div className="bg-[#1a1a1a] p-[30px] rounded-[15px] text-center transition-transform duration-300 cursor-pointer hover:-translate-y-[10px]">
+            <div className="bg-neutral-900 p-[30px] rounded-[15px] text-center transition-transform duration-300 cursor-pointer hover:-translate-y-[10px]">
               <div className="text-[3rem] mb-5">🌐</div>
               <h3 className="text-2xl mb-4 text-white">Accessible Anywhere</h3>
               <p className="text-[#cccccc] leading-relaxed">
@@ -109,7 +106,7 @@ export default function Home() {
         </section>
 
         {/* Call to Action */}
-        <section className="py-[100px] px-5 bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a]">
+        <section className="py-[100px] bg-gradient-to-br from-neutral-900 to-neutral-800">
           <div className="max-w-[800px] mx-auto text-center">
             <h2 className="text-[3rem] mb-5 bg-gradient-to-r from-[#4CAF50] to-[#2196F3] bg-clip-text text-transparent">
               Ready to Start Your Journey?
