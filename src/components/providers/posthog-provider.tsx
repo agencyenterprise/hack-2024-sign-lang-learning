@@ -1,5 +1,6 @@
 "use client";
 
+import { usePostHogUser } from "@/hooks/use-posthog-user";
 import { usePathname, useSearchParams } from "next/navigation";
 import posthog from "posthog-js";
 import { PostHogProvider as Provider } from "posthog-js/react";
@@ -12,6 +13,7 @@ if (typeof window !== "undefined") {
 }
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
+  usePostHogUser();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 

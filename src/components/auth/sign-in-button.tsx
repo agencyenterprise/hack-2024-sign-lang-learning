@@ -1,44 +1,36 @@
 "use client";
 
 import { useAnalytics } from "@/hooks/use-analytics";
-import { signIn, signOut, useSession } from "next-auth/react";
+import {
+  SignInButton as ClerkSignInButton,
+  UserButton,
+  useUser,
+} from "@clerk/nextjs";
 
 export function SignInButton() {
-  const { data: session } = useSession();
+  const { user } = useUser();
   const { trackEvent } = useAnalytics();
 
-  if (session) {
+  if (user) {
     return (
-      <div className="flex items-center gap-4">
-        <img
-          src={session.user?.image ?? ""}
-          alt={session.user?.name ?? ""}
-          className="w-8 h-8 rounded-full"
-        />
-        <button
-          onClick={() => {
-            trackEvent("sign_out_clicked");
-            signOut();
-          }}
-          className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-500"
-          data-analytics="sign-out-button"
-        >
-          Sign Out
-        </button>
-      </div>
+      <UserButton
+        appearance={{
+          elements: {
+            avatarBox: "w-12 h-12",
+          },
+        }}
+      />
     );
   }
 
   return (
-    <button
-      onClick={() => {
-        trackEvent("sign_in_clicked", { provider: "google" });
-        signIn("google");
-      }}
-      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-500"
-      data-analytics="sign-in-button"
-    >
-      Sign In with Google
-    </button>
+    <ClerkSignInButton mode="modal" data-analytics="sign-in-button">
+      <button
+        onClick={() => trackEvent("sign_in_clicked")}
+        className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-500"
+      >
+        Sign In
+      </button>
+    </ClerkSignInButton>
   );
 }
